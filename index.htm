@@ -1,304 +1,680 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>買房 vs. 租房 財務比較工具</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --secondary: #64748b;
-        }
-        body {
-            background-color: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        .card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .input-group label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.25rem;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            outline-color: var(--primary);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>貸款與租房比較工具</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #dbe2ea;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --good: #0f766e;
+      --bad: #b91c1c;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 20px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .panel h2,
+    .results h2 {
+      margin: 0 0 16px;
+      font-size: 20px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      margin: 20px 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--primary);
+      color: white;
+      flex: 1;
+    }
+
+    .secondary {
+      background: #eef2f7;
+      color: var(--text);
+    }
+
+    .results {
+      padding: 20px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .summary-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fcfdff;
+    }
+
+    .summary-box .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+
+    .chart-wrap {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: white;
+      margin-bottom: 18px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 320px;
+      display: block;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 880px;
+      background: white;
+    }
+
+    thead {
+      background: #f8fafc;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    th:first-child, td:first-child { text-align: center; }
+    th:nth-child(2), td:nth-child(2), th:nth-child(3), td:nth-child(3) { text-align: right; }
+
+    .winner-rent {
+      background: rgba(15, 118, 110, 0.06);
+    }
+
+    .winner-buy {
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        position: static;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-gray-900">買房 vs. 租房 財務分析工具</h1>
-            <p class="text-gray-600 mt-2">輸入您的財務參數，比較長期下來的資產變化與支出</p>
-        </header>
+<body>
+  <div class="container">
+    <h1>貸款與租房比較工具</h1>
+    <p class="subtitle">比較多年期內「租房」與「買房貸款」的總支出、淨資產與每年差異。</p>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- 參數輸入區 -->
-            <div class="card p-6 space-y-6">
-                <h2 class="text-xl font-bold border-b pb-2">基本參數</h2>
-                
-                <div class="space-y-4">
-                    <div class="input-group">
-                        <label>房價 (萬元)</label>
-                        <input type="number" id="homePrice" value="1500" step="10">
-                    </div>
-                    <div class="input-group">
-                        <label>自備款比例 (%)</label>
-                        <input type="number" id="downPaymentPct" value="20">
-                    </div>
-                    <div class="input-group">
-                        <label>房貸年利率 (%)</label>
-                        <input type="number" id="interestRate" value="2.1" step="0.1">
-                    </div>
-                    <div class="input-group">
-                        <label>貸款年限 (年)</label>
-                        <input type="number" id="loanTerm" value="30">
-                    </div>
-                    <div class="input-group">
-                        <label>預期房價年增率 (%)</label>
-                        <input type="number" id="homeAppreciation" value="2" step="0.1">
-                    </div>
-                    
-                    <hr>
-                    
-                    <div class="input-group">
-                        <label>起始月租金 (元)</label>
-                        <input type="number" id="monthlyRent" value="30000" step="1000">
-                    </div>
-                    <div class="input-group">
-                        <label>預期租金年增率 (%)</label>
-                        <input type="number" id="rentInflation" value="2" step="0.1">
-                    </div>
-                    <div class="input-group">
-                        <label>投資年報酬率 (%) <br><span class="text-xs font-normal text-gray-500">(將自備款投入市場的機會成本)</span></label>
-                        <input type="number" id="invReturn" value="5" step="0.1">
-                    </div>
-                </div>
+    <div class="grid">
+      <div class="card panel">
+        <div class="badge">獨立 HTML｜可直接存成 .html 開啟</div>
+        <h2>輸入條件</h2>
 
-                <button onclick="calculate()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
-                    立即計算比較
-                </button>
-            </div>
-
-            <!-- 圖表與結果 -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- 摘要數據 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="card p-4 border-l-4 border-blue-500">
-                        <p class="text-sm text-gray-500">預估每月房貸</p>
-                        <p class="text-2xl font-bold text-blue-700" id="resMonthlyPayment">NT$ 0</p>
-                    </div>
-                    <div class="card p-4 border-l-4 border-green-500">
-                        <p class="text-sm text-gray-500">比較建議</p>
-                        <p class="text-lg font-bold text-gray-800" id="resSummary">請點擊計算</p>
-                    </div>
-                </div>
-
-                <!-- 圖表區 -->
-                <div class="card p-6">
-                    <h3 class="text-lg font-bold mb-4">累積資產價值比較 (含房產與投資)</h3>
-                    <div class="h-[400px]">
-                        <canvas id="comparisonChart"></canvas>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-4">* 買房模式資產：房價(扣除貸款餘額)。<br>* 租房模式資產：自備款與每月差額投入投資市場的累計價值。</p>
-                </div>
-
-                <!-- 詳細表格 -->
-                <div class="card p-6 overflow-x-auto">
-                    <h3 class="text-lg font-bold mb-4">多年期詳細對照表</h3>
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="p-2">年份</th>
-                                <th class="p-2">月租金</th>
-                                <th class="p-2">買房累計支出</th>
-                                <th class="p-2">租房累計支出</th>
-                                <th class="p-2">買房淨資產</th>
-                                <th class="p-2">租房淨資產</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detailTable">
-                            <!-- 表格內容由 JS 生成 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="section-title">租房參數</div>
+        <div class="field">
+          <label>
+            <span>每月租金</span>
+            <span class="hint">元</span>
+          </label>
+          <input id="monthlyRent" type="number" value="25000" min="0" step="1000" />
         </div>
+        <div class="field">
+          <label>
+            <span>年租金漲幅</span>
+            <span class="hint">%</span>
+          </label>
+          <input id="rentGrowth" type="number" value="2" min="0" step="0.1" />
+        </div>
+
+        <div class="section-title">買房參數</div>
+        <div class="field">
+          <label>
+            <span>房價</span>
+            <span class="hint">元</span>
+          </label>
+          <input id="housePrice" type="number" value="12000000" min="0" step="100000" />
+        </div>
+        <div class="field">
+          <label>
+            <span>自備款比例</span>
+            <span class="hint">%</span>
+          </label>
+          <input id="downPaymentRate" type="number" value="20" min="0" max="100" step="1" />
+        </div>
+        <div class="field">
+          <label>
+            <span>貸款利率</span>
+            <span class="hint">年利率 %</span>
+          </label>
+          <input id="interestRate" type="number" value="2.2" min="0" step="0.01" />
+        </div>
+        <div class="field">
+          <label>
+            <span>貸款年限</span>
+            <span class="hint">年</span>
+          </label>
+          <input id="loanYears" type="number" value="30" min="1" step="1" />
+        </div>
+        <div class="field">
+          <label>
+            <span>每年持有成本</span>
+            <span class="hint">稅、管理、維修</span>
+          </label>
+          <input id="annualOwnershipCost" type="number" value="60000" min="0" step="1000" />
+        </div>
+        <div class="field">
+          <label>
+            <span>房價年增率</span>
+            <span class="hint">%</span>
+          </label>
+          <input id="houseGrowth" type="number" value="1.5" min="-20" step="0.1" />
+        </div>
+
+        <div class="section-title">比較設定</div>
+        <div class="field">
+          <label>
+            <span>比較年數</span>
+            <span class="hint">1–40 年</span>
+          </label>
+          <input id="compareYears" type="number" value="15" min="1" max="40" step="1" />
+        </div>
+
+        <div class="btn-row">
+          <button class="primary" id="calculateBtn">重新計算</button>
+          <button class="secondary" id="presetBtn">載入範例</button>
+        </div>
+      </div>
+
+      <div class="card results">
+        <h2>比較結果</h2>
+        <div class="summary-grid">
+          <div class="summary-box">
+            <div class="label">租房總支出</div>
+            <div class="value" id="totalRentCost">—</div>
+          </div>
+          <div class="summary-box">
+            <div class="label">買房總現金流出</div>
+            <div class="value" id="totalBuyOutflow">—</div>
+          </div>
+          <div class="summary-box">
+            <div class="label">期末房屋淨資產</div>
+            <div class="value" id="buyEquity">—</div>
+          </div>
+          <div class="summary-box">
+            <div class="label">結論</div>
+            <div class="value" id="finalDecision">—</div>
+          </div>
+        </div>
+
+        <div class="chart-wrap">
+          <canvas id="comparisonChart" width="900" height="320"></canvas>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>年份</th>
+                <th>當年租金支出</th>
+                <th>累計租房支出</th>
+                <th>當年房貸本息</th>
+                <th>當年持有成本</th>
+                <th>累計買房流出</th>
+                <th>剩餘貸款</th>
+                <th>房屋估值</th>
+                <th>房屋淨資產</th>
+                <th>較有利方案</th>
+              </tr>
+            </thead>
+            <tbody id="resultTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="note" id="noteText"></div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        let chartInstance = null;
+  <script>
+    const $ = (id) => document.getElementById(id);
 
-        function calculate() {
-            // 讀取參數
-            const homePrice = parseFloat(document.getElementById('homePrice').value) * 10000;
-            const downPaymentPct = parseFloat(document.getElementById('downPaymentPct').value) / 100;
-            const interestRateYear = parseFloat(document.getElementById('interestRate').value) / 100;
-            const loanTerm = parseInt(document.getElementById('loanTerm').value);
-            const homeAppreciation = parseFloat(document.getElementById('homeAppreciation').value) / 100;
-            
-            const initialRent = parseFloat(document.getElementById('monthlyRent').value);
-            const rentInflation = parseFloat(document.getElementById('rentInflation').value) / 100;
-            const invReturn = parseFloat(document.getElementById('invReturn').value) / 100;
+    const fmtCurrency = (num) => {
+      return new Intl.NumberFormat('zh-TW', {
+        style: 'currency',
+        currency: 'TWD',
+        maximumFractionDigits: 0
+      }).format(num);
+    };
 
-            // 計算房貸 (本息平均攤還)
-            const loanAmount = homePrice * (1 - downPaymentPct);
-            const monthlyRate = interestRateYear / 12;
-            const totalMonths = loanTerm * 12;
-            const monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / (Math.pow(1 + monthlyRate, totalMonths) - 1);
-            
-            document.getElementById('resMonthlyPayment').innerText = `NT$ ${Math.round(monthlyPayment).toLocaleString()}`;
+    const fmtNumber = (num) => {
+      return new Intl.NumberFormat('zh-TW', {
+        maximumFractionDigits: 0
+      }).format(num);
+    };
 
-            // 初始化數據
-            let buyData = [];
-            let rentData = [];
-            let labels = [];
+    function getInputs() {
+      return {
+        monthlyRent: parseFloat($("monthlyRent").value) || 0,
+        rentGrowth: (parseFloat($("rentGrowth").value) || 0) / 100,
+        housePrice: parseFloat($("housePrice").value) || 0,
+        downPaymentRate: (parseFloat($("downPaymentRate").value) || 0) / 100,
+        interestRate: (parseFloat($("interestRate").value) || 0) / 100,
+        loanYears: parseInt($("loanYears").value) || 1,
+        annualOwnershipCost: parseFloat($("annualOwnershipCost").value) || 0,
+        houseGrowth: (parseFloat($("houseGrowth").value) || 0) / 100,
+        compareYears: Math.min(40, Math.max(1, parseInt($("compareYears").value) || 1))
+      };
+    }
 
-            let currentHomeValue = homePrice;
-            let currentLoanBalance = loanAmount;
-            let buyCumulativeSpent = homePrice * downPaymentPct; // 初始投入自備款
-            
-            let currentRent = initialRent;
-            let rentCumulativeSpent = 0;
-            let rentInvestPortfolio = homePrice * downPaymentPct; // 租房者將自備款拿去投資
+    function calcMonthlyPayment(principal, annualRate, years) {
+      const months = years * 12;
+      const monthlyRate = annualRate / 12;
 
-            for (let year = 1; year <= 30; year++) {
-                labels.push(`第 ${year} 年`);
+      if (months <= 0) return 0;
+      if (monthlyRate === 0) return principal / months;
 
-                // 買房邏輯
-                let yearlyMortgage = 0;
-                for(let m=1; m<=12; m++) {
-                    if (currentLoanBalance > 0) {
-                        let interest = currentLoanBalance * monthlyRate;
-                        let principal = monthlyPayment - interest;
-                        currentLoanBalance -= principal;
-                        yearlyMortgage += monthlyPayment;
-                    }
-                }
-                buyCumulativeSpent += yearlyMortgage;
-                currentHomeValue *= (1 + homeAppreciation);
-                let buyEquity = currentHomeValue - Math.max(0, currentLoanBalance);
+      return principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+    }
 
-                // 租房邏輯
-                let yearlyRent = 0;
-                for(let m=1; m<=12; m++) {
-                    yearlyRent += currentRent;
-                    // 假設租房者將「房貸與房租的差額」也投入投資 (簡化版不計此項以利清晰，或可加入)
-                    // 這邊我們只計算初始自備款的滾存
-                }
-                rentCumulativeSpent += yearlyRent;
-                rentInvestPortfolio *= (1 + invReturn); // 自備款投資回報
-                currentRent *= (1 + rentInflation);
+    function generateData(inputs) {
+      const downPayment = inputs.housePrice * inputs.downPaymentRate;
+      const loanPrincipal = Math.max(0, inputs.housePrice - downPayment);
+      const monthlyPayment = calcMonthlyPayment(loanPrincipal, inputs.interestRate, inputs.loanYears);
+      const loanMonths = inputs.loanYears * 12;
+      const compareMonths = inputs.compareYears * 12;
+      const monthlyRate = inputs.interestRate / 12;
 
-                buyData.push({spent: buyCumulativeSpent, equity: buyEquity});
-                rentData.push({spent: rentCumulativeSpent, equity: rentInvestPortfolio});
-            }
+      let remainingLoan = loanPrincipal;
+      let cumulativeRent = 0;
+      let cumulativeBuy = downPayment;
+      let rows = [];
+      let rentSeries = [];
+      let buySeries = [];
+      let equitySeries = [];
 
-            updateChart(labels, buyData.map(d => d.equity), rentData.map(d => d.equity));
-            updateTable(buyData, rentData, initialRent, rentInflation);
-            
-            // 簡易分析
-            const crossoverYear = buyData.findIndex((d, i) => d.equity > rentData[i].equity) + 1;
-            const summaryEl = document.getElementById('resSummary');
-            if(crossoverYear > 0) {
-                summaryEl.innerText = `在第 ${crossoverYear} 年後，買房的資產價值將超過租房投資。`;
-                summaryEl.className = "text-lg font-bold text-blue-600";
+      for (let year = 1; year <= inputs.compareYears; year++) {
+        const annualRent = inputs.monthlyRent * 12 * Math.pow(1 + inputs.rentGrowth, year - 1);
+        cumulativeRent += annualRent;
+
+        let annualMortgagePayment = 0;
+        for (let m = 1; m <= 12; m++) {
+          const currentMonth = (year - 1) * 12 + m;
+          if (currentMonth <= loanMonths && remainingLoan > 0.5) {
+            if (monthlyRate === 0) {
+              const principalPaid = Math.min(remainingLoan, monthlyPayment);
+              remainingLoan -= principalPaid;
+              annualMortgagePayment += principalPaid;
             } else {
-                summaryEl.innerText = `以此參數看，租房並將資金投資可能更具財務優勢。`;
-                summaryEl.className = "text-lg font-bold text-green-600";
+              const interest = remainingLoan * monthlyRate;
+              const principalPaid = Math.min(remainingLoan, monthlyPayment - interest);
+              remainingLoan -= principalPaid;
+              annualMortgagePayment += (principalPaid + interest);
             }
+          }
         }
 
-        function updateChart(labels, buyEquity, rentEquity) {
-            const ctx = document.getElementById('comparisonChart').getContext('2d');
-            
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+        const annualOwnershipCost = inputs.annualOwnershipCost;
+        cumulativeBuy += annualMortgagePayment + annualOwnershipCost;
 
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: '買房資產淨值 (房價-貸款)',
-                            data: buyEquity,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: '租房資產淨值 (自備款投資)',
-                            data: rentEquity,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': NT$ ' + Math.round(context.raw / 10000) + ' 萬';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: function(value) { return (value / 10000) + ' 萬'; }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+        const currentHouseValue = inputs.housePrice * Math.pow(1 + inputs.houseGrowth, year);
+        const equity = currentHouseValue - Math.max(0, remainingLoan);
 
-        function updateTable(buyData, rentData, initialRent, rentInflation) {
-            const tbody = document.getElementById('detailTable');
-            tbody.innerHTML = '';
+        const rentNetCost = cumulativeRent;
+        const buyNetCost = cumulativeBuy - equity;
+        const winner = buyNetCost < rentNetCost ? '買房較有利' : (buyNetCost > rentNetCost ? '租房較有利' : '兩者接近');
 
-            // 每 5 年顯示一筆以節省空間
-            for (let i = 0; i < buyData.length; i++) {
-                if ((i + 1) % 5 === 0 || i === 0) {
-                    const row = document.createElement('tr');
-                    const yearRent = initialRent * Math.pow(1 + rentInflation, i);
-                    row.className = "border-b hover:bg-gray-50";
-                    row.innerHTML = `
-                        <td class="p-2 font-medium">第 ${i + 1} 年</td>
-                        <td class="p-2">NT$ ${Math.round(yearRent).toLocaleString()}</td>
-                        <td class="p-2">NT$ ${Math.round(buyData[i].spent / 10000).toLocaleString()} 萬</td>
-                        <td class="p-2">NT$ ${Math.round(rentData[i].spent / 10000).toLocaleString()} 萬</td>
-                        <td class="p-2 text-blue-600 font-bold">${Math.round(buyData[i].equity / 10000).toLocaleString()} 萬</td>
-                        <td class="p-2 text-green-600 font-bold">${Math.round(rentData[i].equity / 10000).toLocaleString()} 萬</td>
-                    `;
-                    tbody.appendChild(row);
-                }
-            }
-        }
+        rows.push({
+          year,
+          annualRent,
+          cumulativeRent,
+          annualMortgagePayment,
+          annualOwnershipCost,
+          cumulativeBuy,
+          remainingLoan: Math.max(0, remainingLoan),
+          currentHouseValue,
+          equity,
+          winner,
+          rentNetCost,
+          buyNetCost
+        });
 
-        // 頁面加載後執行一次
-        window.onload = calculate;
-    </script>
+        rentSeries.push(cumulativeRent);
+        buySeries.push(cumulativeBuy);
+        equitySeries.push(equity);
+      }
+
+      return {
+        downPayment,
+        loanPrincipal,
+        monthlyPayment,
+        rows
+      };
+    }
+
+    function renderSummary(data) {
+      const last = data.rows[data.rows.length - 1];
+      const buyNetCost = last.cumulativeBuy - last.equity;
+      const diff = Math.abs(last.cumulativeRent - buyNetCost);
+      const isBuyBetter = buyNetCost < last.cumulativeRent;
+
+      $("totalRentCost").textContent = fmtCurrency(last.cumulativeRent);
+      $("totalBuyOutflow").textContent = fmtCurrency(last.cumulativeBuy);
+      $("buyEquity").textContent = fmtCurrency(last.equity);
+
+      const decisionEl = $("finalDecision");
+      decisionEl.textContent = isBuyBetter
+        ? `買房省 ${fmtNumber(diff)} 元`
+        : `租房省 ${fmtNumber(diff)} 元`;
+      decisionEl.className = `value ${isBuyBetter ? 'good' : 'bad'}`;
+
+      $("noteText").textContent = `說明：此工具以「租房累計支出」對比「買房累計現金流出 - 期末房屋淨資產」做比較。買房現金流出包含自備款、房貸本息與每年持有成本。未納入投資報酬、機會成本、稅制細節、裝潢與交易成本，因此適合做初步估算，不適合作為最終購屋決策依據。貸款月付金約為 ${fmtCurrency(data.monthlyPayment)}。`;
+    }
+
+    function renderTable(data) {
+      const tbody = $("resultTableBody");
+      tbody.innerHTML = "";
+
+      data.rows.forEach((row) => {
+        const tr = document.createElement('tr');
+        tr.className = row.winner === '租房較有利' ? 'winner-rent' : (row.winner === '買房較有利' ? 'winner-buy' : '');
+        tr.innerHTML = `
+          <td>${row.year}</td>
+          <td>${fmtCurrency(row.annualRent)}</td>
+          <td>${fmtCurrency(row.cumulativeRent)}</td>
+          <td>${fmtCurrency(row.annualMortgagePayment)}</td>
+          <td>${fmtCurrency(row.annualOwnershipCost)}</td>
+          <td>${fmtCurrency(row.cumulativeBuy)}</td>
+          <td>${fmtCurrency(row.remainingLoan)}</td>
+          <td>${fmtCurrency(row.currentHouseValue)}</td>
+          <td>${fmtCurrency(row.equity)}</td>
+          <td>${row.winner}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderChart(data) {
+      const canvas = $("comparisonChart");
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const cssWidth = canvas.clientWidth || 900;
+      const cssHeight = 320;
+      canvas.width = cssWidth * dpr;
+      canvas.height = cssHeight * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+      const padding = { top: 20, right: 20, bottom: 40, left: 70 };
+      const plotW = cssWidth - padding.left - padding.right;
+      const plotH = cssHeight - padding.top - padding.bottom;
+
+      const rentValues = data.rows.map(r => r.cumulativeRent);
+      const buyNetValues = data.rows.map(r => r.cumulativeBuy - r.equity);
+      const all = [...rentValues, ...buyNetValues];
+      const maxVal = Math.max(...all, 1);
+
+      const x = (i) => padding.left + (plotW * i / Math.max(1, data.rows.length - 1));
+      const y = (v) => padding.top + plotH - (v / maxVal) * plotH;
+
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, padding.top);
+      ctx.lineTo(padding.left, padding.top + plotH);
+      ctx.lineTo(padding.left + plotW, padding.top + plotH);
+      ctx.stroke();
+
+      for (let i = 0; i <= 4; i++) {
+        const value = maxVal * i / 4;
+        const yy = y(value);
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.beginPath();
+        ctx.moveTo(padding.left, yy);
+        ctx.lineTo(padding.left + plotW, yy);
+        ctx.stroke();
+
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(fmtNumber(value), padding.left - 8, yy + 4);
+      }
+
+      function drawLine(values, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        values.forEach((v, i) => {
+          if (i === 0) ctx.moveTo(x(i), y(v));
+          else ctx.lineTo(x(i), y(v));
+        });
+        ctx.stroke();
+
+        values.forEach((v, i) => {
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(x(i), y(v), 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      drawLine(rentValues, '#0f766e');
+      drawLine(buyNetValues, '#2563eb');
+
+      ctx.fillStyle = '#111827';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      data.rows.forEach((row, i) => {
+        ctx.fillText(`${row.year}年`, x(i), padding.top + plotH + 20);
+      });
+
+      ctx.fillStyle = '#0f766e';
+      ctx.fillRect(padding.left, 4, 14, 14);
+      ctx.fillStyle = '#111827';
+      ctx.textAlign = 'left';
+      ctx.fillText('租房累計支出', padding.left + 20, 16);
+
+      ctx.fillStyle = '#2563eb';
+      ctx.fillRect(padding.left + 130, 4, 14, 14);
+      ctx.fillStyle = '#111827';
+      ctx.fillText('買房淨成本（累計流出 - 淨資產）', padding.left + 150, 16);
+    }
+
+    function calculate() {
+      const inputs = getInputs();
+      const data = generateData(inputs);
+      renderSummary(data);
+      renderTable(data);
+      renderChart(data);
+    }
+
+    $("calculateBtn").addEventListener('click', calculate);
+
+    $("presetBtn").addEventListener('click', () => {
+      $("monthlyRent").value = 28000;
+      $("rentGrowth").value = 2;
+      $("housePrice").value = 15000000;
+      $("downPaymentRate").value = 20;
+      $("interestRate").value = 2.35;
+      $("loanYears").value = 30;
+      $("annualOwnershipCost").value = 80000;
+      $("houseGrowth").value = 2;
+      $("compareYears").value = 20;
+      calculate();
+    });
+
+    window.addEventListener('resize', calculate);
+    calculate();
+  </script>
 </body>
 </html>
