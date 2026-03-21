@@ -105,8 +105,8 @@
 <body>
 
     <div id="bg-container">
-        <img id="bg-img-a" class="bg-image active" alt="背景 A">
-        <img id="bg-img-b" class="bg-image" alt="背景 B">
+        <img id="bg-img-a" class="bg-image active" alt="">
+        <img id="bg-img-b" class="bg-image" alt="">
     </div>
 
     <!-- 狀態列 -->
@@ -205,9 +205,15 @@
             <div class="glass-panel space-y-10">
                 <h2 id="ending-title" class="serif text-3xl text-white"></h2>
                 <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed text-base"></div>
-                <button onclick="location.reload()" class="px-12 py-4 border border-white/20 text-neutral-400 hover:text-white hover:border-white transition-all text-[10px] tracking-[0.4em] rounded-full uppercase">
-                    重新開始
-                </button>
+                <div class="flex flex-col gap-4">
+                    <!-- 改為超連結，指向你未來的 info.html 檔案 -->
+                    <a href="info.html" class="w-full py-4 bg-blue-600 text-white font-bold tracking-widest hover:bg-blue-700 transition-all text-xs rounded-lg uppercase flex items-center justify-center">
+                        了解更多資訊
+                    </a>
+                    <button onclick="location.reload()" class="w-full py-4 border border-white/20 text-neutral-400 hover:text-white hover:border-white transition-all text-[10px] tracking-[0.4em] rounded-lg uppercase">
+                        重新開始
+                    </button>
+                </div>
             </div>
         </section>
     </main>
@@ -307,13 +313,11 @@
             }
         ];
 
-        // 圖片切換邏輯
         function changeBackground(fileName) {
             const nextImgId = state.activeImgId === 'bg-img-a' ? 'bg-img-b' : 'bg-img-a';
             const currentImg = document.getElementById(state.activeImgId);
             const nextImg = document.getElementById(nextImgId);
             
-            // 強制使用指定路徑
             nextImg.src = `pic/${fileName}.png`;
             
             nextImg.onload = function() {
@@ -322,7 +326,6 @@
                 state.activeImgId = nextImgId;
             };
 
-            // 圖片載入失敗時的處理
             nextImg.onerror = function() {
                 console.error(`背景圖片載入失敗: pic/${fileName}.png`);
             };
@@ -336,9 +339,11 @@
 
         function showStage(name) {
             hideAll();
-            document.getElementById(name).classList.add('active');
+            const target = document.getElementById(name);
+            if (target) {
+                target.classList.add('active');
+            }
             
-            // 除了 game 階段外，一律顯示 start.png
             if (name !== 'game') {
                 changeBackground('start');
             } else {
@@ -366,7 +371,6 @@
             const content = document.getElementById('game-content');
             content.style.opacity = '0';
             
-            // 關鍵修改：第幾題就對應 sceneX.png
             changeBackground(`scene${state.currentIdx + 1}`);
 
             document.getElementById('scen-counter').innerText = `抉擇 ${state.currentIdx + 1} / ${scenarios.length}`;
@@ -408,7 +412,6 @@
                 if (val) val.innerText = state[k];
             });
             
-            // 如果數值歸零，觸發失敗結局
             if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
                 setTimeout(() => {
                     hideAll();
@@ -428,7 +431,6 @@
 
         function showFinalEnding() {
             showStage('ending');
-            // 結局階段使用 start.png
             changeBackground('start');
             document.getElementById('ending-title').innerText = "漫長告別的開始";
             document.getElementById('ending-desc').innerHTML = `
@@ -439,7 +441,6 @@
         }
 
         window.onload = () => {
-            // 初始背景：start.png
             document.getElementById('bg-img-a').src = 'pic/start.png';
             document.getElementById('bg-img-a').classList.add('active');
         };
