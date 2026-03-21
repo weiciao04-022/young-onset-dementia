@@ -11,7 +11,7 @@
     <style>
         body {
             background: #000000;
-            color: #d4d4d4;
+            color: #f5f5f5;
             font-family: 'Noto Sans TC', sans-serif;
             min-height: 100vh;
             margin: 0;
@@ -19,62 +19,64 @@
         }
         .serif { font-family: 'Noto Serif TC', serif; }
         
-        /* 背景容器 */
+        /* 背景容器優化：確保全螢幕覆蓋 */
         #bg-container {
             position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             z-index: -1;
-            overflow: hidden;
             background: #000;
         }
 
         .bg-image {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transform: translate(-50%, -50%);
-            filter: brightness(0.35); /* 降低亮度以突顯文字 */
-            transition: opacity 1.2s ease-in-out;
+            object-fit: cover; /* 關鍵：確保圖片填滿螢幕不變形 */
+            object-position: center;
+            filter: brightness(0.4); /* 調整亮度確保文字清晰 */
+            transition: opacity 1.5s ease-in-out;
             opacity: 0;
         }
         .bg-image.active {
             opacity: 1;
         }
 
-        .fade-in { animation: fadeIn 0.8s ease forwards; }
+        .fade-in { animation: fadeIn 1s ease-out forwards; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .value-bar { 
-            transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); 
             height: 100%;
         }
 
         .stage { display: none; }
-        .stage.active { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; }
+        .stage.active { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 20px 0; }
 
+        /* 調整面板透明度，讓背景照片更明顯 */
         .glass-panel {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.25rem;
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            width: 100%;
         }
 
         #feedback-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
             z-index: 200;
             display: none;
             flex-direction: column;
@@ -85,10 +87,22 @@
         }
         #feedback-overlay.active { display: flex; }
 
-        .next-btn-anim { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+        .btn-option {
+            width: 100%;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            color: #ccc;
+        }
+        .btn-option:hover {
+            background: rgba(255, 255, 255, 1);
+            color: #000;
+            transform: translateX(5px);
         }
     </style>
 </head>
@@ -101,32 +115,32 @@
     </div>
 
     <!-- 頂部狀態列 -->
-    <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/40 backdrop-blur-md z-[100] border-b border-white/5 hidden">
-        <div class="max-w-xl mx-auto grid grid-cols-3 gap-4">
+    <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/60 backdrop-blur-lg z-[100] border-b border-white/5 hidden">
+        <div class="max-w-xl mx-auto grid grid-cols-3 gap-6">
             <div class="space-y-1">
-                <div class="flex justify-between text-[10px] text-neutral-400 font-bold uppercase">
+                <div class="flex justify-between text-[10px] text-neutral-400 font-bold tracking-wider">
                     <span>患者狀態</span>
                     <span id="val-patient">80</span>
                 </div>
-                <div class="h-1 bg-neutral-900 rounded-full overflow-hidden">
+                <div class="h-1 bg-neutral-800 rounded-full overflow-hidden">
                     <div id="bar-patient" class="value-bar bg-blue-500" style="width: 80%"></div>
                 </div>
             </div>
             <div class="space-y-1">
-                <div class="flex justify-between text-[10px] text-neutral-400 font-bold uppercase">
+                <div class="flex justify-between text-[10px] text-neutral-400 font-bold tracking-wider">
                     <span>尊嚴指數</span>
                     <span id="val-dignity">80</span>
                 </div>
-                <div class="h-1 bg-neutral-900 rounded-full overflow-hidden">
+                <div class="h-1 bg-neutral-800 rounded-full overflow-hidden">
                     <div id="bar-dignity" class="value-bar bg-white" style="width: 80%"></div>
                 </div>
             </div>
             <div class="space-y-1">
-                <div class="flex justify-between text-[10px] text-neutral-400 font-bold uppercase">
+                <div class="flex justify-between text-[10px] text-neutral-400 font-bold tracking-wider">
                     <span>家屬負荷</span>
                     <span id="val-burden">80</span>
                 </div>
-                <div class="h-1 bg-neutral-900 rounded-full overflow-hidden">
+                <div class="h-1 bg-neutral-800 rounded-full overflow-hidden">
                     <div id="bar-burden" class="value-bar bg-red-600" style="width: 80%"></div>
                 </div>
             </div>
@@ -136,57 +150,58 @@
     <main class="max-w-xl mx-auto px-6 relative z-10">
         
         <!-- 前導敘事 -->
-        <section id="prologue" class="stage active fade-in space-y-8 text-center">
-            <div class="glass-panel space-y-6">
+        <section id="prologue" class="stage active fade-in text-center">
+            <div class="glass-panel space-y-8">
                 <h1 class="serif text-3xl font-bold text-white tracking-widest leading-relaxed">面對年輕型失智症<br><span class="text-xl opacity-60 italic">消失的時光</span></h1>
-                <div class="space-y-4 text-neutral-300 font-light leading-relaxed text-sm">
+                <div class="space-y-5 text-neutral-300 font-light leading-relaxed text-sm">
                     <p>一場意外車禍，醫生的拼命治療，讓他留在這個世界。</p>
                     <p>但隨之而來的，是記憶的緩慢淡去。</p>
-                    <p class="serif text-white text-lg py-2">「醫生說，這是阿茲海默症。」</p>
+                    <p class="serif text-white text-lg py-2 border-y border-white/10">「醫生說，這是阿茲海默症。」</p>
                     <p>那年，他才三十九歲。</p>
                 </div>
-                <button onclick="showStage('intro')" class="w-full py-4 border border-white/20 text-white/70 hover:text-white hover:bg-white/10 transition-all tracking-[0.3em] text-[10px] rounded-lg">
+                <button onclick="showStage('intro')" class="w-full py-4 border border-white/20 text-white/70 hover:text-white hover:bg-white/10 transition-all tracking-[0.3em] text-xs rounded-lg mt-4">
                     點擊體驗家屬的生活
                 </button>
             </div>
         </section>
 
         <!-- 年齡猜測 -->
-        <section id="intro" class="stage fade-in space-y-8 text-center">
-            <div class="glass-panel space-y-8">
-                <h2 class="serif text-2xl text-white">你認為最年輕的<br>失智症患者是幾歲？</h2>
+        <section id="intro" class="stage fade-in text-center">
+            <div class="glass-panel space-y-10">
+                <h2 class="serif text-2xl text-white leading-relaxed">你認為全世界報導過<br>最年輕的失智症患者是幾歲？</h2>
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl">21 歲</button>
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl">35 歲</button>
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl">19 歲</button>
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl">45 歲</button>
+                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">21 歲</button>
+                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">35 歲</button>
+                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">19 歲</button>
+                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">45 歲</button>
                 </div>
             </div>
         </section>
 
         <!-- 答案揭曉 -->
-        <section id="answer" class="stage fade-in space-y-8 text-center">
+        <section id="answer" class="stage fade-in text-center">
             <div class="glass-panel space-y-10">
                 <div class="space-y-2">
-                    <p class="text-[10px] tracking-[0.5em] text-neutral-400 uppercase">Medical Reality</p>
+                    <p class="text-[10px] tracking-[0.5em] text-neutral-400 uppercase">Case Report</p>
                     <h2 class="serif text-9xl text-white font-bold">19</h2>
                 </div>
-                <p class="text-neutral-300 font-light leading-relaxed">這不是罕見個案。正值壯年的年紀，有人年薪千萬；有人卻罹患失智症，只能在家。</p>
-                <button onclick="startGame()" class="w-full py-5 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all uppercase text-xs rounded-lg">
-                    幫助家屬選擇更好的生活
+                <p class="text-neutral-300 font-light leading-relaxed text-base">這不是罕見個案。<br>在正值壯年的年紀，有人年薪千萬；<br>有人卻罹患失智症，世界從此停滯。</p>
+                <button onclick="startGame()" class="w-full py-5 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all uppercase text-xs rounded-lg shadow-xl shadow-white/5">
+                    進入家屬的生活抉擇
                 </button>
             </div>
         </section>
 
         <!-- 遊戲核心 -->
         <section id="game" class="stage">
-            <div class="glass-panel space-y-6 relative">
-                <div class="space-y-2 border-b border-white/10 pb-4">
+            <div class="glass-panel space-y-8 relative">
+                <div class="space-y-3 border-b border-white/10 pb-6">
+                    <p id="scen-counter" class="text-[10px] text-white/40 tracking-[0.2em] uppercase"></p>
                     <h3 id="scen-title" class="serif text-2xl text-white font-bold"></h3>
                 </div>
-                <p id="scen-desc" class="text-sm text-neutral-200 font-light leading-relaxed"></p>
-                <div id="game-content" class="opacity-0 transition-opacity duration-700 space-y-3">
-                    <div id="scen-options" class="space-y-3"></div>
+                <p id="scen-desc" class="text-base text-neutral-200 font-light leading-relaxed"></p>
+                <div id="game-content" class="opacity-0 transition-opacity duration-1000 space-y-4">
+                    <div id="scen-options" class="space-y-4"></div>
                 </div>
             </div>
         </section>
@@ -195,9 +210,9 @@
         <section id="ending" class="stage text-center">
             <div class="glass-panel space-y-10">
                 <h2 id="ending-title" class="serif text-3xl text-white">無解的終局</h2>
-                <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed text-sm"></div>
-                <button onclick="location.reload()" class="px-10 py-3 border border-white/20 text-neutral-400 hover:text-white hover:border-white transition-all text-[10px] tracking-[0.3em] rounded-full">
-                    重啟人生
+                <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed text-base"></div>
+                <button onclick="location.reload()" class="px-12 py-4 border border-white/20 text-neutral-400 hover:text-white hover:border-white transition-all text-[10px] tracking-[0.4em] rounded-full uppercase">
+                    重新開始
                 </button>
             </div>
         </section>
@@ -206,9 +221,9 @@
 
     <!-- 反饋遮罩 -->
     <div id="feedback-overlay">
-        <div class="max-w-xs space-y-10">
-            <p id="feedback-text" class="text-lg text-white font-light serif leading-relaxed italic"></p>
-            <button id="next-btn" onclick="nextScenario()" class="next-btn-anim text-[10px] tracking-[0.4em] text-white/60 hover:text-white uppercase">
+        <div class="max-w-md space-y-12">
+            <p id="feedback-text" class="text-xl text-white font-light serif leading-relaxed italic"></p>
+            <button id="next-btn" onclick="nextScenario()" class="text-[10px] tracking-[0.5em] text-white/40 hover:text-white transition-colors uppercase py-4">
                 下一個抉擇 ➜
             </button>
         </div>
@@ -272,18 +287,12 @@
             }
         ];
 
-        /**
-         * 切換背景圖片 (PNG 版本) - 根據您 GitHub 的路徑
-         */
         function changeBackground(name) {
             const nextImgId = state.activeImgId === 'bg-img-a' ? 'bg-img-b' : 'bg-img-a';
             const currentImg = document.getElementById(state.activeImgId);
             const nextImg = document.getElementById(nextImgId);
             
-            // 路徑對應到您 pic 資料夾中的檔名
-            const imgPath = `pic/${name}.png`;
-
-            nextImg.src = imgPath;
+            nextImg.src = `pic/${name}.png`;
             nextImg.onload = function() {
                 nextImg.classList.add('active');
                 currentImg.classList.remove('active');
@@ -325,9 +334,9 @@
             const content = document.getElementById('game-content');
             content.style.opacity = '0';
             
-            // 對應 pic/scene1.png 到 pic/scene5.png
             changeBackground(`scene${state.currentIdx + 1}`);
 
+            document.getElementById('scen-counter').innerText = `Scene ${state.currentIdx + 1} of ${scenarios.length}`;
             document.getElementById('scen-title').innerText = sc.title;
             document.getElementById('scen-desc').innerText = sc.desc;
             
@@ -335,13 +344,13 @@
             optBox.innerHTML = '';
             sc.options.forEach((o, i) => {
                 const b = document.createElement('button');
-                b.className = 'w-full text-left bg-white/5 border border-white/10 p-5 rounded-xl text-sm leading-relaxed hover:bg-white hover:text-black hover:scale-[1.01] transition-all duration-300';
+                b.className = 'btn-option';
                 b.innerText = o.text;
                 b.onclick = () => handleChoice(i);
                 optBox.appendChild(b);
             });
 
-            setTimeout(() => { content.style.opacity = '1'; }, 500);
+            setTimeout(() => { content.style.opacity = '1'; }, 300);
         }
 
         function handleChoice(idx) {
@@ -369,10 +378,10 @@
             if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
                 setTimeout(() => {
                     hideAll();
-                    changeBackground('start'); // 失敗回歸起點背景
+                    changeBackground('start');
                     document.getElementById('ending').classList.add('active');
                     document.getElementById('ending-title').innerText = "生命之火已燃盡";
-                    document.getElementById('ending-desc').innerHTML = "<p>在無盡的選擇中，你們都已筋疲力盡。<br>這不僅是體力的透支，更是靈魂的乾涸。</p>";
+                    document.getElementById('ending-desc').innerHTML = "<p>在無盡的選擇中，你們都已筋疲力盡。<br>這不僅是體力的透支，更是靈魂的乾涸。<br>失智症不僅帶走了他的記憶，也消磨了你的人生。</p>";
                 }, 800);
             }
         }
@@ -389,13 +398,12 @@
             document.getElementById('ending-title').innerText = "漫長告別的開始";
             document.getElementById('ending-desc').innerHTML = `
                 <p>這些抉擇，只是數千個日夜中的冰山一角。</p>
-                <p>年輕型失智症帶走的，不只是記憶，更是那個原本正要發光發熱的人生。<br>希望社會能聽見這些沈默家屬的呼救。</p>
+                <p>年輕型失智症帶走的，不只是記憶，更是那個原本正要發光發熱的人生。<br><br><strong>「他還在那裡，但他已經不在了。」</strong><br><br>希望這段短暫的體驗，能讓你多一份理解與善意。</p>
             `;
         }
 
         window.onload = () => {
-            const firstImg = document.getElementById('bg-img-a');
-            firstImg.src = 'pic/start.png';
+            document.getElementById('bg-img-a').src = 'pic/start.png';
         };
     </script>
 </body>
