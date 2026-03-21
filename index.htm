@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>年輕型失智症：消失的時光</title>
+    <title>年輕型失智症：該如何抉擇</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -150,11 +150,11 @@
                 <div class="space-y-5 text-neutral-300 font-light leading-relaxed text-sm">
                     <p>一場意外車禍，醫生的拼命治療，讓他留在這個世界。</p>
                     <p>但是，他卻和以前變得不一樣了。</p>
-                    <p class="serif text-white text-lg py-2 border-y border-white/10">「醫生說，這是阿茲海默症。」</p>
+                    <p class="serif text-white text-lg py-2 border-y border-white/10">「醫生說，這是失智症。」</p>
                     <p>那年，他才三十九歲。</p>
                 </div>
                 <button onclick="showStage('intro')" class="w-full py-4 border border-white/20 text-white/70 hover:text-white hover:bg-white/10 transition-all tracking-[0.3em] text-xs rounded-lg mt-4">
-                    點擊體驗家屬的生活
+                    了解更多
                 </button>
             </div>
         </section>
@@ -179,7 +179,7 @@
                     <p class="text-[10px] tracking-[0.5em] text-neutral-400 uppercase">Case Report</p>
                     <h2 class="serif text-9xl text-white font-bold">19</h2>
                 </div>
-                <p class="text-neutral-300 font-light leading-relaxed text-base">這不是罕見個案。<br>在正值壯年的年紀，有人年薪千萬；<br>有人卻罹患失智症，世界從此停滯。</p>
+                <p class="text-neutral-300 font-light leading-relaxed text-base">這不是個案。<br>在正值壯年的年紀，有人年薪千萬；<br>有人卻罹患失智症，世界從此停滯。</p>
                 <button onclick="startGame()" class="w-full py-5 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all uppercase text-xs rounded-lg">
                     進入家屬的生活抉擇
                 </button>
@@ -241,12 +241,12 @@
                 options: [
                     { text: '深呼吸，溫柔地帶他去看剛吃完的空碗。', impact: { patient: 5, dignity: 5, burden: -10 }, feedback: '他露出困惑但安心的神情。你卻在轉身時感到一陣巨大的疲憊。' },
                     { text: '不再爭論，再給他準備一份少量的點心。', impact: { patient: 10, dignity: 0, burden: -5 }, feedback: '他高興地吃了。但你擔心長久下去他的血糖與體重會失控。' },
-                    { text: '終於崩潰大喊：「你剛剛才吃過！為什麼一直問！」', impact: { patient: -15, dignity: -20, burden: 5 }, feedback: '他被嚇壞了，縮在沙發角落。家裡安靜了，但空氣中充滿了罪惡感。' }
+                    { text: '終於崩潰大喊：「你剛剛才吃過！為什麼一直問！」', impact: { patient: -15, dignity: -20, burden: 5 }, feedback: '他被嚇壞了，縮在沙發角落。' }
                 ]
             },
             {
                 title: '我還要去上班',
-                desc: '他堅持自己還能上班，但同事發現他連簡單的報表都會出錯。老闆私下找你，婉轉表達希望他「提前退休」。',
+                desc: '他堅持自己還能上班，但同事發現他連自己上班的位子在哪都找不到。老闆私下找你，婉轉表達希望他「提前退休」。',
                 options: [
                     { text: '實話實說，告訴他社會現在還沒準備好接納他。', impact: { patient: -10, dignity: -25, burden: 10 }, feedback: '他沉默地撕掉識別證，眼神裡最後的光熄滅了。' },
                     { text: '騙他公司在改組，先休息一陣子。', impact: { patient: 5, dignity: 15, burden: -10 }, feedback: '保住了他的自尊，但他每天準時著裝待發，讓謊言變得更難圓。' },
@@ -255,11 +255,11 @@
             },
             {
                 title: '老友聚會',
-                desc: '昔日老友邀你參加聚會，你很想去呼吸新鮮空氣，但他現在只要你不在視線內就會極度焦慮。',
+                desc: '昔日老友邀請你參加聚會，你很想去呼吸新鮮空氣，但他現在只要你不在視線內就會極度焦慮。',
                 options: [
-                    { text: '帶著他一起參加，希望能讓他接觸人群。', impact: { patient: -10, dignity: -15, burden: -25 }, feedback: '他在餐廳因吵雜而尖叫。老友們的憐憫眼神讓你感覺自己與世界脫節。' },
-                    { text: '婉拒邀請，留在家陪他看舊影片。', impact: { patient: 10, dignity: 5, burden: -15 }, feedback: '他在你的陪伴下很平穩，但你看著群組的照片，感到自己正被世界遺棄。' },
-                    { text: '請臨時看護代班兩小時，自己偷偷跑去喝杯咖啡。', impact: { patient: -10, dignity: 0, burden: 25 }, feedback: '那一小段自由讓你重新活過來，但一踏進家門面對他的哭鬧，壓力倍增。' }
+                    { text: '帶著他一起參加，希望能讓他接觸人群。', impact: { patient: -10, dignity: -15, burden: -25 }, feedback: '他在餐廳因吵雜而尖叫。老友們的懼怕和閃避眼神讓你覺得丟臉。' },
+                    { text: '婉拒邀請，留在家陪他看舊影片。', impact: { patient: 10, dignity: 5, burden: -15 }, feedback: '他在你的陪伴下很平穩，但你看著群組的照片，慢慢遺失自我。' },
+                    { text: '請臨時看護代班兩小時，自己偷偷跑去喝杯咖啡。', impact: { patient: -10, dignity: 0, burden: 10 }, feedback: '那一小段自由讓你重新活過來，但一踏進家門面對他的質疑：「為何有外人在家？」' }
                 ]
             },
             {
