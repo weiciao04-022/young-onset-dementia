@@ -19,6 +19,7 @@
         }
         .serif { font-family: 'Noto Serif TC', serif; }
         
+        /* 背景容器與淡入淡出效果 */
         #bg-container {
             position: fixed;
             top: 0;
@@ -37,8 +38,8 @@
             height: 100%;
             object-fit: cover;
             object-position: center;
-            filter: brightness(0.4);
-            transition: opacity 1.5s ease-in-out;
+            filter: brightness(0.35); /* 稍微降低亮度提升文字可讀性 */
+            transition: opacity 1.2s ease-in-out; /* 淡入淡出時間 */
             opacity: 0;
         }
         .bg-image.active { opacity: 1; }
@@ -58,7 +59,7 @@
         .stage.active { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 20px 0; }
 
         .glass-panel {
-            background: rgba(10, 10, 10, 0.7);
+            background: rgba(10, 10, 10, 0.65);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -104,8 +105,9 @@
 </head>
 <body>
 
+    <!-- 背景交替層 -->
     <div id="bg-container">
-        <img id="bg-img-a" class="bg-image active" alt="">
+        <img id="bg-img-a" class="bg-image" alt="">
         <img id="bg-img-b" class="bg-image" alt="">
     </div>
 
@@ -309,12 +311,22 @@
             }
         ];
 
+        /**
+         * 切換背景圖片 (支援淡入淡出)
+         * @param {string} fileName 圖片檔名 (不含路徑與副檔名)
+         */
         function changeBackground(fileName) {
             const nextImgId = state.activeImgId === 'bg-img-a' ? 'bg-img-b' : 'bg-img-a';
             const currentImg = document.getElementById(state.activeImgId);
             const nextImg = document.getElementById(nextImgId);
             
-            nextImg.src = `pic/${fileName}.png`;
+            // 預載圖片
+            const newSrc = `pic/${fileName}.png`;
+            
+            // 如果圖片路徑沒變，就不重複觸發動畫
+            if (currentImg.src.includes(newSrc) && currentImg.classList.contains('active')) return;
+
+            nextImg.src = newSrc;
             
             nextImg.onload = function() {
                 nextImg.classList.add('active');
@@ -329,6 +341,10 @@
             document.getElementById('status-bar').classList.add('hidden');
         }
 
+        /**
+         * 顯示特定階段
+         * 除了 game 階段，其餘一律使用 start.png 背景
+         */
         function showStage(name) {
             hideAll();
             const target = document.getElementById(name);
@@ -336,10 +352,12 @@
                 target.classList.add('active');
             }
             
-            if (name !== 'game') {
-                changeBackground('start');
-            } else {
+            // 根據階段決定背景
+            if (name === 'game') {
                 document.getElementById('status-bar').classList.remove('hidden');
+                // 遊戲背景由 loadScenario 決定
+            } else {
+                changeBackground('start');
             }
             window.scrollTo(0, 0);
         }
@@ -363,6 +381,7 @@
             const content = document.getElementById('game-content');
             content.style.opacity = '0';
             
+            // 切換至對應題目的背景 (scene1, scene2...)
             changeBackground(`scene${state.currentIdx + 1}`);
 
             document.getElementById('scen-counter').innerText = `抉擇 ${state.currentIdx + 1} / ${scenarios.length}`;
@@ -432,9 +451,11 @@
             `;
         }
 
+        // 初始化
         window.onload = () => {
-            document.getElementById('bg-img-a').src = 'pic/start.png';
-            document.getElementById('bg-img-a').classList.add('active');
+            const initialImg = document.getElementById('bg-img-a');
+            initialImg.src = 'pic/start.png';
+            initialImg.classList.add('active');
         };
     </script>
 </body>
