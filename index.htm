@@ -50,6 +50,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            background: #000;
         }
 
         #freeze-frame {
@@ -61,6 +62,7 @@
             opacity: 0;
             transition: opacity 1s ease;
             z-index: 5;
+            pointer-events: none;
         }
 
         #feedback-overlay {
@@ -126,7 +128,7 @@
             
             <div class="video-box aspect-video w-full rounded">
                 <video class="main-video" autoplay muted loop playsinline>
-                    <source src="./pic/start.mp4" type="video/mp4">
+                    <source src="pic/start.mp4" type="video/mp4">
                 </video>
             </div>
 
@@ -142,7 +144,7 @@
             </button>
         </section>
 
-        <!-- 年齡猜測 (無影片) -->
+        <!-- 年齡猜測 -->
         <section id="intro" class="stage fade-in space-y-12 text-center py-12">
             <h2 class="serif text-2xl text-white">你認為最年輕的<br>失智症患者是幾歲？</h2>
             <div class="grid grid-cols-2 gap-4">
@@ -153,7 +155,7 @@
             </div>
         </section>
 
-        <!-- 答案揭曉 (無影片) -->
+        <!-- 答案揭曉 -->
         <section id="answer" class="stage fade-in space-y-12 text-center py-12">
             <div class="space-y-4">
                 <p class="text-[10px] tracking-[0.5em] text-neutral-600 uppercase">Medical Reality</p>
@@ -170,7 +172,6 @@
         <!-- 遊戲核心區段 -->
         <section id="game" class="stage space-y-8">
             <div class="video-box aspect-video w-full rounded shadow-2xl">
-                <!-- 影片路徑會由 JS 自動更新為 pic/scene1.mp4, pic/scene2.mp4... -->
                 <video id="game-video" class="main-video" muted playsinline></video>
                 <img id="freeze-frame" src="" alt="情境定格">
                 <div class="absolute bottom-4 right-4 z-20 bg-black/50 px-3 py-1 rounded">
@@ -216,7 +217,8 @@
             dignity: 80,
             burden: 80,
             currentIdx: 0,
-            isLocked: false
+            isLocked: false,
+            timerId: null
         };
 
         const scenarios = [
@@ -271,17 +273,24 @@
             document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
             document.getElementById('feedback-overlay').classList.remove('active');
             document.getElementById('status-bar').classList.add('hidden');
+            if(state.timerId) clearInterval(state.timerId);
         }
 
         function showStage(name) {
             hideAll();
             document.getElementById(name).classList.add('active');
-            if (name === 'game') document.getElementById('status-bar').classList.remove('hidden');
+            if (name === 'game') {
+                document.getElementById('status-bar').classList.remove('hidden');
+            }
             window.scrollTo(0,0);
         }
 
         function startGame() {
             state.currentIdx = 0;
+            state.patient = 80;
+            state.dignity = 80;
+            state.burden = 80;
+            refreshBars();
             showStage('game');
             loadScenario();
         }
@@ -294,20 +303,31 @@
             }
 
             state.isLocked = true;
-            document.getElementById('game-content').style.opacity = '0';
-            document.getElementById('freeze-frame').style.opacity = '0';
-            
-            // 影片路徑邏輯：目前題數 (index+1)
-            const video = document.getElementById('game-video');
-            const sceneNumber = state.currentIdx + 1;
-            video.src = `./pic/scene${sceneNumber}.mp4`; 
-            video.load(); 
-            video.play();
-            
-            // 定格圖路徑邏輯：目前題數 (index+1)
+            const content = document.getElementById('game-content');
             const freeze = document.getElementById('freeze-frame');
-            freeze.src = `./pic/scene${sceneNumber}_freeze.jpg`;
+            const video = document.getElementById('game-video');
+            const timerTxt = document.getElementById('timer-text');
             
+            content.style.opacity = '0';
+            freeze.style.opacity = '0';
+            
+            const sceneNum = state.currentIdx + 1;
+            
+            // 設定影片路徑
+            video.src = "pic/scene" + sceneNum + ".mp4";
+            freeze.src = "pic/scene" + sceneNum + "_freeze.jpg";
+            
+            // 嘗試播放，若失敗則直接進入選項
+            video.load();
+            const playPromise = video.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("影片播放失敗或不存在，直接顯示內容");
+                    endScenarioIntro();
+                });
+            }
+
             document.getElementById('scen-title').innerText = sc.title;
             document.getElementById('scen-desc').innerText = sc.desc;
             
@@ -322,12 +342,14 @@
             });
 
             let timeLeft = 5;
-            document.getElementById('timer-text').innerText = `00:0${timeLeft}`;
-            const timer = setInterval(() => {
+            timerTxt.innerText = "00:0" + timeLeft;
+            
+            if(state.timerId) clearInterval(state.timerId);
+            state.timerId = setInterval(() => {
                 timeLeft--;
-                if (timeLeft >= 0) document.getElementById('timer-text').innerText = `00:0${timeLeft}`;
+                if (timeLeft >= 0) timerTxt.innerText = "00:0" + timeLeft;
                 if (timeLeft <= 0) {
-                    clearInterval(timer);
+                    clearInterval(state.timerId);
                     endScenarioIntro();
                 }
             }, 1000);
@@ -337,7 +359,9 @@
             state.isLocked = false;
             document.getElementById('freeze-frame').style.opacity = '1'; 
             document.getElementById('timer-text').innerText = "FREEZE";
-            setTimeout(() => { document.getElementById('game-content').style.opacity = '1'; }, 300);
+            setTimeout(() => { 
+                document.getElementById('game-content').style.opacity = '1'; 
+            }, 300);
         }
 
         function handleChoice(idx) {
@@ -356,15 +380,22 @@
         function refreshBars() {
             const keys = ['patient', 'dignity', 'burden'];
             keys.forEach(k => {
-                const bar = document.getElementById(`bar-${k}`);
-                const valTxt = document.getElementById(`v-${k}`);
+                const bar = document.getElementById('bar-' + k);
+                const valTxt = document.getElementById('v-' + k);
                 if (bar) {
                     valTxt.innerText = state[k];
                     bar.style.width = state[k] + '%';
                 }
             });
+            
+            // 失敗判定
             if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
-                setTimeout(() => showStage('ending'), 800);
+                setTimeout(() => {
+                    hideAll();
+                    document.getElementById('ending').classList.add('active');
+                    document.getElementById('ending-title').innerText = "你失敗了。";
+                    document.getElementById('ending-desc').innerHTML = "<p>不是你做錯，而是沒有一個選擇是對的。<br>這就是年輕型失智症家屬每天的現實。</p>";
+                }, 800);
             }
         }
 
@@ -382,8 +413,6 @@
                 <p>雖然努力在愛與尊嚴中取捨，但現實依然沈重。<br>謝謝你願意嘗試理解年輕型失智症家屬的艱難。</p>
             `;
         }
-
-        refreshBars();
     </script>
 </body>
 </html>
