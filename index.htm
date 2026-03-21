@@ -19,7 +19,7 @@
         }
         .serif { font-family: 'Noto Serif TC', serif; }
         
-        /* 背景容器：圖片切換 */
+        /* 背景容器 */
         #bg-container {
             position: fixed;
             inset: 0;
@@ -38,8 +38,8 @@
             height: 100%;
             object-fit: cover;
             transform: translate(-50%, -50%);
-            filter: brightness(0.4);
-            transition: opacity 1.5s ease-in-out;
+            filter: brightness(0.35); /* 降低亮度以突顯文字 */
+            transition: opacity 1.2s ease-in-out;
             opacity: 0;
         }
         .bg-image.active {
@@ -61,55 +61,55 @@
         .stage.active { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; }
 
         .glass-panel {
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem;
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
         }
 
         #feedback-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(25px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
             z-index: 200;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2.5rem;
+            padding: 2rem;
             text-align: center;
         }
         #feedback-overlay.active { display: flex; }
 
-        .next-btn-anim { animation: pulse 1.5s infinite; }
+        .next-btn-anim { animation: pulse 2s infinite; }
         @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 背景容器：使用兩個 Image 標籤實現淡入淡出切換 -->
+    <!-- 背景容器 -->
     <div id="bg-container">
         <img id="bg-img-a" class="bg-image active" alt="背景 A">
         <img id="bg-img-b" class="bg-image" alt="背景 B">
     </div>
 
     <!-- 頂部狀態列 -->
-    <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/60 backdrop-blur-md z-[100] border-b border-white/5 hidden">
+    <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/40 backdrop-blur-md z-[100] border-b border-white/5 hidden">
         <div class="max-w-xl mx-auto grid grid-cols-3 gap-4">
             <div class="space-y-1">
                 <div class="flex justify-between text-[10px] text-neutral-400 font-bold uppercase">
                     <span>患者狀態</span>
                     <span id="val-patient">80</span>
                 </div>
-                <div class="h-1.5 bg-neutral-900 rounded-full overflow-hidden">
-                    <div id="bar-patient" class="value-bar bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" style="width: 80%"></div>
+                <div class="h-1 bg-neutral-900 rounded-full overflow-hidden">
+                    <div id="bar-patient" class="value-bar bg-blue-500" style="width: 80%"></div>
                 </div>
             </div>
             <div class="space-y-1">
@@ -117,8 +117,8 @@
                     <span>尊嚴指數</span>
                     <span id="val-dignity">80</span>
                 </div>
-                <div class="h-1.5 bg-neutral-900 rounded-full overflow-hidden">
-                    <div id="bar-dignity" class="value-bar bg-white shadow-[0_0_8px_rgba(255,255,255,0.3)]" style="width: 80%"></div>
+                <div class="h-1 bg-neutral-900 rounded-full overflow-hidden">
+                    <div id="bar-dignity" class="value-bar bg-white" style="width: 80%"></div>
                 </div>
             </div>
             <div class="space-y-1">
@@ -126,8 +126,8 @@
                     <span>家屬負荷</span>
                     <span id="val-burden">80</span>
                 </div>
-                <div class="h-1.5 bg-neutral-900 rounded-full overflow-hidden">
-                    <div id="bar-burden" class="value-bar bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" style="width: 80%"></div>
+                <div class="h-1 bg-neutral-900 rounded-full overflow-hidden">
+                    <div id="bar-burden" class="value-bar bg-red-600" style="width: 80%"></div>
                 </div>
             </div>
         </div>
@@ -139,13 +139,13 @@
         <section id="prologue" class="stage active fade-in space-y-8 text-center">
             <div class="glass-panel space-y-6">
                 <h1 class="serif text-3xl font-bold text-white tracking-widest leading-relaxed">面對年輕型失智症<br><span class="text-xl opacity-60 italic">消失的時光</span></h1>
-                <div class="space-y-4 text-neutral-300 font-light leading-relaxed">
+                <div class="space-y-4 text-neutral-300 font-light leading-relaxed text-sm">
                     <p>一場意外車禍，醫生的拼命治療，讓他留在這個世界。</p>
                     <p>但隨之而來的，是記憶的緩慢淡去。</p>
                     <p class="serif text-white text-lg py-2">「醫生說，這是阿茲海默症。」</p>
                     <p>那年，他才三十九歲。</p>
                 </div>
-                <button onclick="showStage('intro')" class="w-full py-4 border border-white/20 text-white/70 hover:text-white hover:bg-white/10 transition-all tracking-[0.3em] text-xs rounded-lg">
+                <button onclick="showStage('intro')" class="w-full py-4 border border-white/20 text-white/70 hover:text-white hover:bg-white/10 transition-all tracking-[0.3em] text-[10px] rounded-lg">
                     點擊體驗家屬的生活
                 </button>
             </div>
@@ -172,7 +172,7 @@
                     <h2 class="serif text-9xl text-white font-bold">19</h2>
                 </div>
                 <p class="text-neutral-300 font-light leading-relaxed">這不是罕見個案。正值壯年的年紀，有人年薪千萬；有人卻罹患失智症，只能在家。</p>
-                <button onclick="startGame()" class="w-full py-5 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all uppercase text-sm rounded-lg">
+                <button onclick="startGame()" class="w-full py-5 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all uppercase text-xs rounded-lg">
                     幫助家屬選擇更好的生活
                 </button>
             </div>
@@ -181,10 +181,10 @@
         <!-- 遊戲核心 -->
         <section id="game" class="stage">
             <div class="glass-panel space-y-6 relative">
-                <div class="flex justify-between items-start border-b border-white/10 pb-4 mb-2">
+                <div class="space-y-2 border-b border-white/10 pb-4">
                     <h3 id="scen-title" class="serif text-2xl text-white font-bold"></h3>
                 </div>
-                <p id="scen-desc" class="text-base text-neutral-200 font-light leading-relaxed"></p>
+                <p id="scen-desc" class="text-sm text-neutral-200 font-light leading-relaxed"></p>
                 <div id="game-content" class="opacity-0 transition-opacity duration-700 space-y-3">
                     <div id="scen-options" class="space-y-3"></div>
                 </div>
@@ -194,9 +194,9 @@
         <!-- 結局 -->
         <section id="ending" class="stage text-center">
             <div class="glass-panel space-y-10">
-                <h2 id="ending-title" class="serif text-5_xl text-white">無解的終局</h2>
-                <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed"></div>
-                <button onclick="location.reload()" class="px-10 py-3 border border-white/20 text-neutral-400 hover:text-white hover:border-white transition-all text-xs tracking-[0.3em] rounded-full">
+                <h2 id="ending-title" class="serif text-3xl text-white">無解的終局</h2>
+                <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed text-sm"></div>
+                <button onclick="location.reload()" class="px-10 py-3 border border-white/20 text-neutral-400 hover:text-white hover:border-white transition-all text-[10px] tracking-[0.3em] rounded-full">
                     重啟人生
                 </button>
             </div>
@@ -207,8 +207,8 @@
     <!-- 反饋遮罩 -->
     <div id="feedback-overlay">
         <div class="max-w-xs space-y-10">
-            <p id="feedback-text" class="text-xl text-white font-light serif leading-relaxed italic"></p>
-            <button id="next-btn" onclick="nextScenario()" class="next-btn-anim text-xs tracking-[0.4em] text-white/60 hover:text-white uppercase">
+            <p id="feedback-text" class="text-lg text-white font-light serif leading-relaxed italic"></p>
+            <button id="next-btn" onclick="nextScenario()" class="next-btn-anim text-[10px] tracking-[0.4em] text-white/60 hover:text-white uppercase">
                 下一個抉擇 ➜
             </button>
         </div>
@@ -230,7 +230,7 @@
                 desc: '吃完晚餐才十分鐘，他第十五次詢問「我們什麼時候吃飯？」。你剛結束整天的加班，耐心已消磨殆盡。',
                 options: [
                     { text: '深呼吸，帶他去看空碗，溫柔地說「剛吃過了」。', impact: { patient: 5, dignity: 5, burden: -10 }, feedback: '他露出困惑但安心的神情。你卻在轉身時感到一陣巨大的疲憊。' },
-                    { text: '遞給他一塊餅乾，告訴他先墊墊胃。', impact: { patient: 10, dignity: 0, burden: -5 }, feedback: '他高興地吃了。但這導致他血糖升高且體重失控，增加了未來的照顧負擔。' },
+                    { text: '遞給他一塊餅乾，告訴他先墊墊胃。', impact: { patient: 10, dignity: 0, burden: -5 }, feedback: '他高興地吃了。但這導致他血糖升高且增加未來的照顧負擔。' },
                     { text: '終於崩潰大喊：「你剛剛才吃過！為什麼一直問！」', impact: { patient: -15, dignity: -20, burden: 5 }, feedback: '他被嚇壞了，縮在沙發角落。家裡安靜了，但空氣中充滿了令人窒息的罪惡感。' }
                 ]
             },
@@ -240,15 +240,15 @@
                 options: [
                     { text: '帶著他一起參加。希望能讓他多接觸人群。', impact: { patient: -5, dignity: -15, burden: -20 }, feedback: '他在餐廳因吵雜而尖叫，老友們雖然安慰你，但眼神中卻充滿了憐憫與不安。' },
                     { text: '拒絕邀請，留在家陪他。', impact: { patient: 10, dignity: 5, burden: -10 }, feedback: '他在你的陪伴下很平穩，但你看著群組裡熱鬧的照片，感到自己正被世界遺棄。' },
-                    { text: '雇請臨時看護兩小時，自己偷偷跑去喝杯咖啡。', impact: { patient: -10, dignity: 0, burden: 20 }, feedback: '那一小段自由讓你重新活過來，但一踏進家門，面對看護的抱怨與他的哭鬧，壓力變倍增。' }
+                    { text: '雇請臨時看護兩小時，自己偷偷跑去喝杯咖啡。', impact: { patient: -10, dignity: 0, burden: 20 }, feedback: '那一小段自由讓你重新活過來，但一踏進家門面對他的哭鬧，壓力倍增。' }
                 ]
             },
             {
                 title: '迷失的瞬間',
-                desc: '一轉頭，他趁你曬衣服時推開沒鎖好的門走失了。三小時後警察在火車站發現他，他正對著路人說要去找已經過世的母親。',
+                desc: '一轉頭，他趁你曬衣服時走失了。三小時後警察發現他，他正對著路人說要去找已經過世的母親。',
                 options: [
                     { text: '緊緊抱住他，什麼都不責備，只說「回來就好」。', impact: { patient: 15, dignity: 10, burden: -10 }, feedback: '他像個孩子般大哭。但你意識到，你必須把家裡變成一座更堅固的監牢。' },
-                    { text: '幫他掛上「防走失手鍊」，上面刻著你的電話與「我有失智症」。', impact: { patient: 0, dignity: -25, burden: 10 }, feedback: '安全性提升了，但看著那條手鍊，你覺得那是他在社會中尊嚴的墓碑。' },
+                    { text: '幫他掛上「防走失手鍊」，上面刻著你的電話與病況。', impact: { patient: 0, dignity: -25, burden: 10 }, feedback: '安全性提升了，但看著那條手鍊，你覺得那是他在社會中尊嚴的墓碑。' },
                     { text: '強制他在家時必須待在有圍欄的房間。', impact: { patient: -20, dignity: -30, burden: 15 }, feedback: '雖然再也不會走失，但他在圍欄內憤怒地搥門，讓你的心碎了一地。' }
                 ]
             },
@@ -262,35 +262,26 @@
                 ]
             },
             {
-                title: '清晨的混亂',
-                desc: '凌晨三點，他突然穿好西裝站在床頭，大喊著要遲到了。他試圖推開窗戶「抄近路」去上班，情況非常危險。',
-                options: [
-                    { text: '跟他玩一場戲：穿上外衣，帶他在樓下繞一圈再回房間。', impact: { patient: 15, dignity: 5, burden: -25 }, feedback: '他終於願意上床睡覺。但隔天你要上班時，大腦像塞滿了鉛。' },
-                    { text: '給他服用醫師開的鎮靜藥物，讓他強制休息。', impact: { patient: -10, dignity: 0, burden: 20 }, feedback: '家裡安靜了，你看著藥罐，懷疑自己是在照顧他，還是在消滅他的意識。' },
-                    { text: '與他爭執這是不合理的行為，試圖用邏輯喚醒他。', impact: { patient: -20, dignity: -10, burden: -15 }, feedback: '爭執引發了他的暴力傾向，你的手臂上多了一道深深的抓痕。' }
-                ]
-            },
-            {
                 title: '最後的決定',
                 desc: '你已經筋疲力盡，親友勸你送機構。但因為他太年輕，只有昂貴的精神護理院願意收。',
                 options: [
                     { text: '簽下合約。承認自己無法承擔，看著他被帶走。', impact: { patient: -30, dignity: -10, burden: 40 }, feedback: '負擔減輕了，但你回家看著空蕩蕩的客廳，心碎的聲音比他尖叫時更響。' },
                     { text: '堅持留在家，向政府爭取更多居家服務。', impact: { patient: 10, dignity: 10, burden: -20 }, feedback: '他在熟悉的環境，但居服員也常因為他的「年輕體力」而被嚇走。' },
-                    { text: '賣掉房子，搬去更遠、更便宜的護理機構陪他一起住。', impact: { patient: 10, dignity: -15, burden: -30 }, feedback: '你們在一起，但你失去原本的工作與生活。' }
+                    { text: '賣掉房子，搬去更便宜的護理機構陪他一起住。', impact: { patient: 10, dignity: -15, burden: -30 }, feedback: '你們在一起，但你失去原本的工作與生活。' }
                 ]
             }
         ];
 
         /**
-         * 切換背景圖片 (PNG 版本)
+         * 切換背景圖片 (PNG 版本) - 根據您 GitHub 的路徑
          */
         function changeBackground(name) {
             const nextImgId = state.activeImgId === 'bg-img-a' ? 'bg-img-b' : 'bg-img-a';
             const currentImg = document.getElementById(state.activeImgId);
             const nextImg = document.getElementById(nextImgId);
             
-            // 將副檔名統一為 .png
-            const imgPath = `./pic/${name}.png`;
+            // 路徑對應到您 pic 資料夾中的檔名
+            const imgPath = `pic/${name}.png`;
 
             nextImg.src = imgPath;
             nextImg.onload = function() {
@@ -298,21 +289,6 @@
                 currentImg.classList.remove('active');
                 state.activeImgId = nextImgId;
             };
-        }
-
-        /**
-         * 預載下一張圖以確保流暢
-         */
-        function preloadNext(index) {
-            const nextIdx = index + 1;
-            let fileName = '';
-            if (nextIdx < scenarios.length) fileName = `scene${nextIdx + 1}`;
-            else if (nextIdx === scenarios.length) fileName = 'ending';
-            
-            if (fileName) {
-                const img = new Image();
-                img.src = `./pic/${fileName}.png`;
-            }
         }
 
         function hideAll() {
@@ -349,9 +325,8 @@
             const content = document.getElementById('game-content');
             content.style.opacity = '0';
             
-            // 背景圖片切換：對應 scene1.png, scene2.png ...
+            // 對應 pic/scene1.png 到 pic/scene5.png
             changeBackground(`scene${state.currentIdx + 1}`);
-            preloadNext(state.currentIdx);
 
             document.getElementById('scen-title').innerText = sc.title;
             document.getElementById('scen-desc').innerText = sc.desc;
@@ -394,7 +369,7 @@
             if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
                 setTimeout(() => {
                     hideAll();
-                    changeBackground('ending');
+                    changeBackground('start'); // 失敗回歸起點背景
                     document.getElementById('ending').classList.add('active');
                     document.getElementById('ending-title').innerText = "生命之火已燃盡";
                     document.getElementById('ending-desc').innerHTML = "<p>在無盡的選擇中，你們都已筋疲力盡。<br>這不僅是體力的透支，更是靈魂的乾涸。</p>";
@@ -410,7 +385,7 @@
 
         function showFinalEnding() {
             showStage('ending');
-            changeBackground('ending');
+            changeBackground('start');
             document.getElementById('ending-title').innerText = "漫長告別的開始";
             document.getElementById('ending-desc').innerHTML = `
                 <p>這些抉擇，只是數千個日夜中的冰山一角。</p>
@@ -420,7 +395,7 @@
 
         window.onload = () => {
             const firstImg = document.getElementById('bg-img-a');
-            firstImg.src = './pic/start.png';
+            firstImg.src = 'pic/start.png';
         };
     </script>
 </body>
