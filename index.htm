@@ -30,7 +30,7 @@
             background: #000;
         }
 
-        #global-bg, #global-video {
+        #global-video {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -40,8 +40,9 @@
             height: auto;
             transform: translate(-50%, -50%);
             object-fit: cover;
-            filter: brightness(0.5);
-            transition: opacity 1.2s ease;
+            filter: brightness(0.4);
+            transition: opacity 1s ease-in-out;
+            opacity: 0;
         }
 
         .fade-in { animation: fadeIn 0.8s ease forwards; }
@@ -60,26 +61,26 @@
         .stage.active { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; }
 
         .glass-panel {
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1.5rem;
             padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
 
         #feedback-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(25px);
             z-index: 200;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
         }
         #feedback-overlay.active { display: flex; }
@@ -93,11 +94,9 @@
 </head>
 <body>
 
-    <!-- 背景容器 -->
+    <!-- 背景容器：純影片模式 -->
     <div id="bg-container">
-        <!-- 預設顯示 start.png -->
-        <img id="global-bg" src="./pic/start.png" alt="背景故事">
-        <video id="global-video" muted loop playsinline style="opacity: 0;"></video>
+        <video id="global-video" muted loop playsinline></video>
     </div>
 
     <!-- 頂部狀態列 -->
@@ -204,7 +203,7 @@
 
     </main>
 
-    <!-- 反饋 -->
+    <!-- 反饋遮罩 -->
     <div id="feedback-overlay">
         <div class="max-w-xs space-y-10">
             <p id="feedback-text" class="text-xl text-white font-light serif leading-relaxed italic"></p>
@@ -271,36 +270,35 @@
             }
         ];
 
-        const bgImg = document.getElementById('global-bg');
         const bgVid = document.getElementById('global-video');
 
-        function updateBackground(type, index) {
-            const fileName = index === 0 ? 'start' : `scene${index}`;
-            const imgPath = `./pic/${fileName}.png`;
-            const vidPath = `./pic/${fileName}.mp4`;
+        /**
+         * 切換背景影片邏輯
+         * @param {string} name 影片檔案名稱 (不含副檔名)
+         */
+        function changeBackground(name) {
+            const vidPath = `./pic/${name}.mp4`;
 
-            // 先把兩者都隱藏
-            bgImg.style.opacity = '0';
+            // 先淡出當前畫面
             bgVid.style.opacity = '0';
 
-            // 試著切換背景 (邏輯：優先顯示影片，如果影片載入失敗或不播放則退回圖片)
-            // 在實際環境中，為了穩定性，我們讓開發者決定使用哪種。這裡我們動態偵測。
-            
-            // 更新圖片源
-            bgImg.src = imgPath;
-            bgImg.style.opacity = '1';
-
-            // 嘗試播放影片 (非強制)
-            bgVid.src = vidPath;
-            bgVid.load();
-            bgVid.play().then(() => {
-                bgVid.style.opacity = '1';
-                bgImg.style.opacity = '0'; // 如果影片成功，隱藏圖片
-            }).catch(() => {
-                // 影片失敗沒關係，圖片已經在那裡了
-                bgVid.style.opacity = '0';
-                bgImg.style.opacity = '1';
-            });
+            setTimeout(() => {
+                // 更換影片來源
+                bgVid.src = vidPath;
+                bgVid.load();
+                
+                // 播放影片
+                const playPromise = bgVid.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // 播放成功後淡入
+                        bgVid.style.opacity = '1';
+                    }).catch(error => {
+                        console.log("影片播放受阻：", error);
+                    });
+                }
+            }, 300);
         }
 
         function hideAll() {
@@ -339,8 +337,8 @@
             const content = document.getElementById('game-content');
             content.style.opacity = '0';
             
-            // 更新背景
-            updateBackground('scene', state.currentIdx + 1);
+            // 切換對應的影片檔案 (scene1.mp4, scene2.mp4...)
+            changeBackground(`scene${state.currentIdx + 1}`);
 
             document.getElementById('scen-title').innerText = sc.title;
             document.getElementById('scen-desc').innerText = sc.desc;
@@ -349,7 +347,7 @@
             optBox.innerHTML = '';
             sc.options.forEach((o, i) => {
                 const b = document.createElement('button');
-                b.className = 'w-full text-left bg-white/5 border border-white/10 p-5 rounded-xl text-sm leading-relaxed hover:bg-white hover:text-black hover:scale-[1.02] transition-all duration-300';
+                b.className = 'w-full text-left bg-white/5 border border-white/10 p-5 rounded-xl text-sm leading-relaxed hover:bg-white hover:text-black hover:scale-[1.01] transition-all duration-300';
                 b.innerText = o.text;
                 b.onclick = () => handleChoice(i);
                 optBox.appendChild(b);
@@ -385,6 +383,7 @@
             if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
                 setTimeout(() => {
                     hideAll();
+                    changeBackground('ending');
                     document.getElementById('ending').classList.add('active');
                     document.getElementById('ending-title').innerText = "生命之火已燃盡";
                     document.getElementById('ending-desc').innerHTML = "<p>在無盡的選擇中，你們都已筋疲力盡。<br>這不是你的錯，這是年輕型失智症家屬共有的困境。</p>";
@@ -400,6 +399,7 @@
 
         function showFinalEnding() {
             showStage('ending');
+            changeBackground('ending');
             document.getElementById('ending-title').innerText = "漫長告別的開始";
             document.getElementById('ending-desc').innerHTML = `
                 <p>五個抉擇，僅是家屬生活中的幾秒鐘。</p>
@@ -407,9 +407,9 @@
             `;
         }
 
-        // 初始背景
+        // 初始載入 start.mp4
         window.onload = () => {
-            updateBackground('start', 0);
+            changeBackground('start');
         };
     </script>
 </body>
