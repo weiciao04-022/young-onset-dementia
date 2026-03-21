@@ -25,7 +25,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 狀態條動畫與內容顯示 */
         .value-bar { 
             transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1); 
             display: flex;
@@ -47,7 +46,6 @@
             overflow: hidden;
         }
         
-        /* 影片播放器樣式 */
         .main-video {
             width: 100%;
             height: 100%;
@@ -90,12 +88,11 @@
 </head>
 <body>
 
-    <!-- 頂部圖形狀態列 -->
+    <!-- 頂部狀態列 -->
     <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/80 backdrop-blur-md z-[100] border-b border-white/10 hidden">
         <div class="max-w-xl mx-auto grid grid-cols-3 gap-3">
             <div class="space-y-1">
                 <div class="flex items-center gap-1 mb-1">
-                    <svg class="w-3 h-3 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-1 11H7v-2h2v2zm0-4H7V5h2v4zm4 4h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg>
                     <span class="text-[10px] text-neutral-500 uppercase font-bold tracking-tighter">患者狀態</span>
                 </div>
                 <div class="h-4 bg-neutral-900 rounded-sm overflow-hidden border border-white/5">
@@ -104,7 +101,6 @@
             </div>
             <div class="space-y-1">
                 <div class="flex items-center gap-1 mb-1">
-                    <svg class="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                     <span class="text-[10px] text-neutral-500 uppercase font-bold tracking-tighter">尊嚴指數</span>
                 </div>
                 <div class="h-4 bg-neutral-900 rounded-sm overflow-hidden border border-white/5">
@@ -113,11 +109,10 @@
             </div>
             <div class="space-y-1">
                 <div class="flex items-center gap-1 mb-1">
-                    <svg class="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
                     <span class="text-[10px] text-neutral-500 uppercase font-bold tracking-tighter">家屬負荷</span>
                 </div>
                 <div class="h-4 bg-neutral-900 rounded-sm overflow-hidden border border-white/5">
-                    <div id="bar-burden" class="value-bar h-full bg-red-700 shadow-[inset_0_0_10px_rgba(0,0,0,0.3)]" style="width: 80%"><span id="v-burden">80</span>%</div>
+                    <div id="bar-burden" class="value-bar h-full bg-red-700 shadow-[inset_0_0_10_rgba(0,0,0,0.3)]" style="width: 80%"><span id="v-burden">80</span>%</div>
                 </div>
             </div>
         </div>
@@ -125,16 +120,13 @@
 
     <main class="max-w-xl mx-auto px-6 min-h-screen flex flex-col justify-center py-20">
         
-         <!-- 前導敘事 -->
+        <!-- 前導敘事 -->
         <section id="prologue" class="stage active fade-in space-y-8 text-center">
-            <h1 class="serif text-3xl font-bold text-white tracking-widest">面對年輕型失智症<br><span class="text-xl opacity-60">該如何取捨</span></h1>
+            <h1 class="serif text-3xl font-bold text-white tracking-widest">面對年輕型失智症<br><span class="text-xl opacity-60">您該如何取捨</span></h1>
             
-            <!-- 【插入影片 1】：前導敘事背景影片 -->
-            <!-- 檔案路徑更新為：./pic/start.mp4 -->
             <div class="video-box aspect-video w-full rounded">
                 <video class="main-video" autoplay muted loop playsinline>
                     <source src="./pic/start.mp4" type="video/mp4">
-                    
                 </video>
             </div>
 
@@ -142,8 +134,6 @@
                 <p>一場意外車禍，</p>
                 <p>醫生的拼命治療，讓他留在這個世界。</p>
                 <p>但隨之而來的，是記憶的緩慢淡去。</p>
-                <p>您的家人，開始和以前的他不一樣</p>
-                <p>前往精神內科檢查後，</p>
                 <p class="serif text-white text-lg py-4">「醫生說，這是阿茲海默症。」</p>
                 <p>那年，他才三十九歲。</p>
             </div>
@@ -152,30 +142,27 @@
             </button>
         </section>
 
-        <!-- 年齡猜測 -->
-        <section id="intro" class="stage fade-in space-y-12 text-center">
+        <!-- 年齡猜測 (無影片) -->
+        <section id="intro" class="stage fade-in space-y-12 text-center py-12">
             <h2 class="serif text-2xl text-white">你認為最年輕的<br>失智症患者是幾歲？</h2>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="showStage('answer')" class="py-6 border border-neutral-800 hover:bg-white hover:text-black transition-all">21 歲</button>
-                <button onclick="showStage('answer')" class="py-6 border border-neutral-800 hover:bg-white hover:text-black transition-all">35 歲</button>
-                <button onclick="showStage('answer')" class="py-6 border border-neutral-800 hover:bg-white hover:text-black transition-all">19 歲</button>
-                <button onclick="showStage('answer')" class="py-6 border border-neutral-800 hover:bg-white hover:text-black transition-all">45 歲</button>
+                <button onclick="showStage('answer')" class="py-10 border border-neutral-800 hover:bg-white hover:text-black transition-all text-xl">21 歲</button>
+                <button onclick="showStage('answer')" class="py-10 border border-neutral-800 hover:bg-white hover:text-black transition-all text-xl">35 歲</button>
+                <button onclick="showStage('answer')" class="py-10 border border-neutral-800 hover:bg-white hover:text-black transition-all text-xl">19 歲</button>
+                <button onclick="showStage('answer')" class="py-10 border border-neutral-800 hover:bg-white hover:text-black transition-all text-xl">45 歲</button>
             </div>
         </section>
 
-        <!-- 答案揭曉 -->
-        <section id="answer" class="stage fade-in space-y-8 text-center">
-            <p class="text-[10px] tracking-[0.5em] text-neutral-600 uppercase">Medical Reality</p>
-            <h2 class="serif text-8xl text-white">19</h2>
-            <div class="text-neutral-400 font-light max-w-xs mx-auto leading-relaxed">
-                <p>這不是罕見個案。</p>
-                <p>正值壯年的年紀，</p>
-                <p>有人年薪千萬；</p>
-                <p>有人卻罹患年輕型失智症，只能在家。</p>
-                <p>他們的家屬也在一天又一天的日子，</p>
-                <p>24小時貼身照顧。</p>
+        <!-- 答案揭曉 (無影片) -->
+        <section id="answer" class="stage fade-in space-y-12 text-center py-12">
+            <div class="space-y-4">
+                <p class="text-[10px] tracking-[0.5em] text-neutral-600 uppercase">Medical Reality</p>
+                <h2 class="serif text-9xl text-white">19</h2>
             </div>
-            <button onclick="startGame()" class="w-full py-4 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all">
+            <div class="text-neutral-400 font-light max-w-xs mx-auto leading-relaxed space-y-4">
+                <p>這不是罕見個案。正值壯年的年紀，有人年薪千萬；有人卻罹患失智症，只能在家。</p>
+            </div>
+            <button onclick="startGame()" class="w-full py-5 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all uppercase text-sm">
                 幫助家屬選擇更好的生活
             </button>
         </section>
@@ -183,13 +170,9 @@
         <!-- 遊戲核心區段 -->
         <section id="game" class="stage space-y-8">
             <div class="video-box aspect-video w-full rounded shadow-2xl">
-                <!-- 影片會由 JS 根據 data 中的 id 動態切換 -->
-                <video id="game-video" class="main-video" muted playsinline>
-                    <source src="" type="video/mp4">
-                </video>
-                
+                <!-- 影片路徑會由 JS 自動更新為 pic/scene1.mp4, pic/scene2.mp4... -->
+                <video id="game-video" class="main-video" muted playsinline></video>
                 <img id="freeze-frame" src="" alt="情境定格">
-                
                 <div class="absolute bottom-4 right-4 z-20 bg-black/50 px-3 py-1 rounded">
                     <span id="timer-text" class="font-mono text-white text-xs">00:05</span>
                 </div>
@@ -208,7 +191,6 @@
         <section id="ending" class="stage text-center space-y-12">
             <h2 id="ending-title" class="serif text-5xl text-white">無解的終局</h2>
             <div id="ending-desc" class="space-y-6 text-neutral-500 font-light leading-relaxed">
-                <p>你的每一個決定都充滿善意，但現實從不曾減輕你的壓力。</p>
                 <p>這就是年輕型失智症家屬每天都將面臨的。</p>
             </div>
             <button onclick="location.reload()" class="px-10 py-3 border border-neutral-800 text-neutral-500 hover:text-white hover:border-white transition-all text-xs tracking-[0.3em]">
@@ -223,7 +205,7 @@
         <div class="max-w-xs space-y-8">
             <p id="feedback-text" class="text-lg text-white font-light serif leading-relaxed italic"></p>
             <button onclick="nextScenario()" class="next-btn-anim text-xs tracking-[0.4em] text-neutral-400 hover:text-white uppercase">
-                下一段抉擇 ➜
+                下一個抉擇 ➜
             </button>
         </div>
     </div>
@@ -237,115 +219,50 @@
             isLocked: false
         };
 
-        const data = [
+        const scenarios = [
             {
-                id: 1, // 對應 pic/scen_1.mp4
                 title: '晚餐過後',
                 desc: '吃完晚餐才十分鐘，他第十五次詢問「我們什麼時候吃飯？」。你剛結束整天的加班，耐心已消磨殆盡。',
                 options: [
-                    {
-                        text: '深呼吸，帶他去看空碗，溫柔地說「剛吃過了」。',
-                        impact: { patient: 5, dignity: 5, burden: -10 },
-                        feedback: '他露出困惑但安心的神情。你卻在轉身時感到一陣巨大的疲憊。'
-                    },
-                    {
-                        text: '遞給他一塊餅乾，告訴他先墊墊胃。',
-                        impact: { patient: 10, dignity: 0, burden: -5 },
-                        feedback: '他高興地吃了。但這導致他血糖升高且體重失控，增加了未來的照顧負擔。'
-                    },
-                    {
-                        text: '終於崩潰大喊：「你剛剛才吃過！為什麼一直問！」',
-                        impact: { patient: -15, dignity: -20, burden: 5 },
-                        feedback: '他被嚇壞了，縮在沙發角落。家裡安靜了，但空氣中充滿了令人窒息的罪惡感。'
-                    }
+                    { text: '深呼吸，帶他去看空碗，溫柔地說「剛吃過了」。', impact: { patient: 5, dignity: 5, burden: -10 }, feedback: '他露出困惑但安心的神情。你卻在轉身時感到一陣巨大的疲憊。' },
+                    { text: '遞給他一塊餅乾，告訴他先墊墊胃。', impact: { patient: 10, dignity: 0, burden: -5 }, feedback: '他高興地吃了。但這導致他血糖升高且體重失控，增加了未來的照顧負擔。' },
+                    { text: '終於崩潰大喊：「你剛剛才吃過！為什麼一直問！」', impact: { patient: -15, dignity: -20, burden: 5 }, feedback: '他被嚇壞了，縮在沙發角落。家裡安靜了，但空氣中充滿了令人窒息的罪惡感。' }
                 ]
             },
             {
-                id: 2, // 對應 pic/scen_2.mp4
                 title: '應徵工作',
                 desc: '他不到四十歲，堅持「我還能上班」。你去幫他接洽熟識的店鋪嘗試簡易工作，但老闆得知病況後婉拒了。',
                 options: [
-                    {
-                        text: '實話實說，告訴他社會現在還沒準備好接納他。',
-                        impact: { patient: -10, dignity: -20, burden: 10 },
-                        feedback: '他沉默地撕掉名片，眼神裡最後的光熄滅了。'
-                    },
-                    {
-                        text: '編造謊言：「現在景氣不好，大家都在放假」。',
-                        impact: { patient: 5, dignity: 10, burden: -5 },
-                        feedback: '保住了他的自尊，但他每天準時著裝待發，你的謊言越來越難圓。'
-                    },
-                    {
-                        text: '自己在家開設模擬工作坊，讓他處理家務並付「薪水」。',
-                        impact: { patient: 10, dignity: 15, burden: -20 },
-                        feedback: '他覺得自己很有用。但你的經濟與心理壓力變得更加沈重。'
-                    }
+                    { text: '實話實說，告訴他社會現在還沒準備好接納他。', impact: { patient: -10, dignity: -20, burden: 10 }, feedback: '他沉默地撕掉名片，眼神裡最後的光熄滅了。' },
+                    { text: '編造謊言：「現在景氣不好，大家都在放假」。', impact: { patient: 5, dignity: 10, burden: -5 }, feedback: '保住了他的自尊，但他每天準時著裝待發，你的謊言越來越難圓。' },
+                    { text: '自己在家開設模擬工作坊，讓他處理家務並付「薪水」。', impact: { patient: 10, dignity: 15, burden: -20 }, feedback: '他覺得自己很有用。但你的經濟與心理壓力變得更加沈重。' }
                 ]
             },
             {
-                id: 3, // 對應 pic/scen_3.mp4
                 title: '超市失控',
-                desc: '超市排隊時，他突然因為找不到錢包而恐慌尖叫，甚至推倒了前方的路人。路人憤怒地要求報警，甚至質疑他是裝瘋賣傻。',
+                desc: '超市排隊時，他突然因為找不到錢包而恐慌尖叫，甚至推倒了前方的路人。路人憤怒地要求報警。',
                 options: [
-                    {
-                        text: '不斷鞠躬致歉，並大聲解釋「他生病了，他不是故意的」。',
-                        impact: { patient: 0, dignity: -30, burden: -10 },
-                        feedback: '人群散去，但他聽到你說他生病，臉上滿是羞愧與自我厭惡。'
-                    },
-                    {
-                        text: '私下賠償路人損失，並迅速帶他離開現場。',
-                        impact: { patient: 5, dignity: 5, burden: -15 },
-                        feedback: '保住了場面，但你的口袋與意志力都因此縮水。'
-                    },
-                    {
-                        text: '當場跟他一起情緒崩潰，對路人大喊「你懂什麼！」。',
-                        impact: { patient: -10, dignity: -10, burden: 15 },
-                        feedback: '雖然一時發洩，但場面失控，你們最後被帶進警局處理。'
-                    }
+                    { text: '不斷鞠躬致歉，並大聲解釋「他生病了，他不是故意的」。', impact: { patient: 0, dignity: -30, burden: -10 }, feedback: '人群散去，但他聽到你說他生病，臉上滿是羞愧。' },
+                    { text: '私下賠償路人損失，並迅速帶他離開現場。', impact: { patient: 5, dignity: 5, burden: -15 }, feedback: '保住了場面，但你的口袋與意志力都因此縮水。' },
+                    { text: '當場跟他一起情緒崩潰，對路人大喊「你懂什麼！」。', impact: { patient: -10, dignity: -10, burden: 15 }, feedback: '雖然一時發洩，但場面失控，你們最後被帶進警局處理。' }
                 ]
             },
             {
-                id: 4, // 對應 pic/scen_4.mp4
                 title: '申請補助',
-                desc: '醫生說他大腦萎縮，但鑑定結果卻因為他「身體功能強健（能走能跑）」而不符失能補助。所有的重擔，只能由家庭承擔。',
+                desc: '鑑定結果卻因為他「身體功能強健」而不符失能補助。所有的重擔，只能由家庭承擔。',
                 options: [
-                    {
-                        text: '花錢請律師與專家，準備漫長的上訴與複查程序。',
-                        impact: { patient: 0, dignity: 0, burden: -30 },
-                        feedback: '這是一場法律與精力的馬拉松，在拿到錢之前，你可能先垮掉。'
-                    },
-                    {
-                        text: '放棄補助，兼職更多工作來支付昂貴的日間照護費。',
-                        impact: { patient: 10, dignity: 5, burden: -25 },
-                        feedback: '他獲得了照顧，但你已經連續三個月每天睡不到四小時。'
-                    },
-                    {
-                        text: '減少照護開銷，將他關在家中，並安裝遠端攝影機監控。',
-                        impact: { patient: -20, dignity: -20, burden: 10 },
-                        feedback: '經濟省下了，但他在監控畫面中孤獨轉圈的模樣，讓你心如刀割。'
-                    }
+                    { text: '花錢請律師與專家，準備漫長的上訴與複查程序。', impact: { patient: 0, dignity: 0, burden: -30 }, feedback: '這是一場法律馬拉松，在拿到錢之前，你可能先垮掉。' },
+                    { text: '放棄補助，兼職更多工作來支付昂貴的日間照護費。', impact: { patient: 10, dignity: 5, burden: -25 }, feedback: '他獲得了照顧，但你已經連續三個月每天睡不到四小時。' },
+                    { text: '減少照護開銷，將他關在家中，並安裝遠端攝影機監控。', impact: { patient: -20, dignity: -20, burden: 10 }, feedback: '經濟省下了，但他在監控畫面中孤獨轉圈的模樣，讓你心如刀割。' }
                 ]
             },
             {
-                id: 5, // 對應 pic/scen_5.mp4
                 title: '最後的決定',
-                desc: '你已經筋疲力盡，親友勸你送機構，但因為他太年輕，一般安養中心不收，只有昂貴的精神護理院願意收。',
+                desc: '你已經筋疲力盡，親友勸你送機構。但因為他太年輕，只有昂貴的精神護理院願意收。',
                 options: [
-                    {
-                        text: '簽下合約。承認自己無法承擔，看著他被帶走。',
-                        impact: { patient: -30, dignity: -10, burden: 40 },
-                        feedback: '負擔減輕了，但你回家看著空蕩蕩的客廳，心碎的聲音比他尖叫時更響。'
-                    },
-                    {
-                        text: '堅持留在家，向政府爭取更多居家服務。',
-                        impact: { patient: 10, dignity: 10, burden: -20 },
-                        feedback: '他在熟悉的環境，但居服員也常因為他的「年輕體力」而被嚇走。'
-                    },
-                    {
-                        text: '賣掉房子，搬去更遠、更便宜的護理機構陪他一起住。',
-                        impact: { patient: 10, dignity: -15, burden: -30 },
-                        feedback: '你們在一起，但你失去原本的工作、原本的生活和自己。'
-                    }
+                    { text: '簽下合約。承認自己無法承擔，看著他被帶走。', impact: { patient: -30, dignity: -10, burden: 40 }, feedback: '負擔減輕了，但你回家看著空蕩蕩的客廳，心碎的聲音比他尖叫時更響。' },
+                    { text: '堅持留在家，向政府爭取更多居家服務。', impact: { patient: 10, dignity: 10, burden: -20 }, feedback: '他在熟悉的環境，但居服員也常因為他的「年輕體力」而被嚇走。' },
+                    { text: '賣掉房子，搬去更遠、更便宜的護理機構陪他一起住。', impact: { patient: 10, dignity: -15, burden: -30 }, feedback: '你們在一起，但你失去原本的工作與生活。' }
                 ]
             }
         ];
@@ -364,12 +281,13 @@
         }
 
         function startGame() {
+            state.currentIdx = 0;
             showStage('game');
             loadScenario();
         }
 
         function loadScenario() {
-            const sc = data[state.currentIdx];
+            const sc = scenarios[state.currentIdx];
             if (!sc) {
                 showFinalEnding();
                 return;
@@ -379,14 +297,16 @@
             document.getElementById('game-content').style.opacity = '0';
             document.getElementById('freeze-frame').style.opacity = '0';
             
-            // 設定並播放情境影片
+            // 影片路徑邏輯：目前題數 (index+1)
             const video = document.getElementById('game-video');
-            video.src = `./pic/scen_${sc.id}.mp4`;
+            const sceneNumber = state.currentIdx + 1;
+            video.src = `./pic/scene${sceneNumber}.mp4`; 
+            video.load(); 
             video.play();
             
-            // 預設好定格圖路徑
+            // 定格圖路徑邏輯：目前題數 (index+1)
             const freeze = document.getElementById('freeze-frame');
-            freeze.src = `./pic/scen_${sc.id}_freeze.jpg`;
+            freeze.src = `./pic/scene${sceneNumber}_freeze.jpg`;
             
             document.getElementById('scen-title').innerText = sc.title;
             document.getElementById('scen-desc').innerText = sc.desc;
@@ -401,7 +321,6 @@
                 optBox.appendChild(b);
             });
 
-            // 5秒倒數與影片同步
             let timeLeft = 5;
             document.getElementById('timer-text').innerText = `00:0${timeLeft}`;
             const timer = setInterval(() => {
@@ -416,14 +335,14 @@
 
         function endScenarioIntro() {
             state.isLocked = false;
-            document.getElementById('freeze-frame').style.opacity = '1'; // 顯示定格圖
+            document.getElementById('freeze-frame').style.opacity = '1'; 
             document.getElementById('timer-text').innerText = "FREEZE";
             setTimeout(() => { document.getElementById('game-content').style.opacity = '1'; }, 300);
         }
 
         function handleChoice(idx) {
             if (state.isLocked) return;
-            const opt = data[state.currentIdx].options[idx];
+            const opt = scenarios[state.currentIdx].options[idx];
             
             state.patient = Math.min(100, Math.max(0, state.patient + opt.impact.patient));
             state.dignity = Math.min(100, Math.max(0, state.dignity + opt.impact.dignity));
@@ -437,13 +356,16 @@
         function refreshBars() {
             const keys = ['patient', 'dignity', 'burden'];
             keys.forEach(k => {
-                const val = state[k];
-                document.getElementById(`v-${k}`).innerText = val;
-                document.getElementById(`bar-${k}`).style.width = val + '%';
-                if (val <= 0) {
-                    setTimeout(() => showStage('ending'), 800);
+                const bar = document.getElementById(`bar-${k}`);
+                const valTxt = document.getElementById(`v-${k}`);
+                if (bar) {
+                    valTxt.innerText = state[k];
+                    bar.style.width = state[k] + '%';
                 }
             });
+            if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
+                setTimeout(() => showStage('ending'), 800);
+            }
         }
 
         function nextScenario() {
@@ -457,8 +379,7 @@
             document.getElementById('ending-title').innerText = "旅程的終點";
             document.getElementById('ending-desc').innerHTML = `
                 <p>五個決擇，五年時間。</p>
-                <p>你試圖在愛、尊嚴與生存之間取得平衡，但是您的家人還是因為腦袋退化的太快而過世。<br>但失智症最殘酷的地方在於：它是一個慢慢侵蝕你的生活的惡魔。</p>
-                <p class="text-white mt-4 italic">「謝謝你，願意了解這個很難有完美結局的故事。」</p>
+                <p>雖然努力在愛與尊嚴中取捨，但現實依然沈重。<br>謝謝你願意嘗試理解年輕型失智症家屬的艱難。</p>
             `;
         }
 
