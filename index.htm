@@ -180,17 +180,14 @@
             </button>
         </section>
 
-        <!-- 遊戲核心 -->
+        <!-- 遊戲核心區段 -->
         <section id="game" class="stage space-y-8">
             <div class="video-box aspect-video w-full rounded shadow-2xl">
-                <!-- 【動態插入影片】：每個情境對應的影片 -->
-                <!-- 影片路徑由 JS 動態生成：./pic/scen_1.mp4 ... ./pic/scen_5.mp4 -->
+                <!-- 影片會由 JS 根據 data 中的 id 動態切換 -->
                 <video id="game-video" class="main-video" muted playsinline>
                     <source src="" type="video/mp4">
                 </video>
                 
-                <!-- 【動態插入定格圖】：影片結束後的定格畫面 -->
-                <!-- 圖片路徑由 JS 動態生成：./pic/scen_1_freeze.jpg ... ./pic/scen_5_freeze.jpg -->
                 <img id="freeze-frame" src="" alt="情境定格">
                 
                 <div class="absolute bottom-4 right-4 z-20 bg-black/50 px-3 py-1 rounded">
