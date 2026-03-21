@@ -15,20 +15,33 @@
             font-family: 'Noto Sans TC', sans-serif;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* 防止滾動條干擾沉浸感 */
+            overflow-x: hidden;
         }
         .serif { font-family: 'Noto Serif TC', serif; }
         
-        /* 全螢幕背景圖層 */
-        #global-bg {
+        /* 背景容器 */
+        #bg-container {
             position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
             z-index: -1;
-            filter: brightness(0.4); /* 降低亮度以凸顯文字 */
-            transition: opacity 1.5s ease, transform 8s linear;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #global-bg, #global-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            filter: brightness(0.5);
+            transition: opacity 1.2s ease;
         }
 
         .fade-in { animation: fadeIn 0.8s ease forwards; }
@@ -37,35 +50,29 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 數值條樣式 */
+        /* 數值條 */
         .value-bar { 
             transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 4px;
-            font-size: 9px;
-            font-weight: bold;
-            color: rgba(255,255,255,0.9);
+            height: 100%;
         }
 
         .stage { display: none; }
         .stage.active { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; }
 
-        /* 半透明內容面板 */
         .glass-panel {
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 2rem;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         #feedback-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.92);
             backdrop-filter: blur(20px);
             z-index: 200;
             display: none;
@@ -77,42 +84,50 @@
         }
         #feedback-overlay.active { display: flex; }
 
-        .next-btn-anim {
-            animation: pulse 1.5s infinite;
-        }
+        .next-btn-anim { animation: pulse 1.5s infinite; }
         @keyframes pulse {
             0%, 100% { opacity: 0.6; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.05); }
         }
-
-        /* 背景縮放效果 */
-        .bg-zoom { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
-    <!-- 全螢幕動態背景 - 改為 start.png -->
-    <img id="global-bg" src="./pic/start.png" alt="背景故事" class="bg-zoom">
+    <!-- 背景容器 -->
+    <div id="bg-container">
+        <!-- 預設顯示 start.png -->
+        <img id="global-bg" src="./pic/start.png" alt="背景故事">
+        <video id="global-video" muted loop playsinline style="opacity: 0;"></video>
+    </div>
 
     <!-- 頂部狀態列 -->
-    <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/40 backdrop-blur-md z-[100] border-b border-white/10 hidden">
-        <div class="max-w-xl mx-auto grid grid-cols-3 gap-3">
+    <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/60 backdrop-blur-md z-[100] border-b border-white/5 hidden">
+        <div class="max-w-xl mx-auto grid grid-cols-3 gap-4">
             <div class="space-y-1">
-                <span class="text-[9px] text-neutral-400 uppercase font-bold tracking-tighter">患者狀態</span>
-                <div class="h-2 bg-neutral-900 rounded-full overflow-hidden">
-                    <div id="bar-patient" class="value-bar h-full bg-blue-500 shadow-lg" style="width: 80%"></div>
+                <div class="flex justify-between text-[10px] text-neutral-400 font-bold uppercase">
+                    <span>患者狀態</span>
+                    <span id="val-patient">80</span>
+                </div>
+                <div class="h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+                    <div id="bar-patient" class="value-bar bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" style="width: 80%"></div>
                 </div>
             </div>
             <div class="space-y-1">
-                <span class="text-[9px] text-neutral-400 uppercase font-bold tracking-tighter">尊嚴指數</span>
-                <div class="h-2 bg-neutral-900 rounded-full overflow-hidden">
-                    <div id="bar-dignity" class="value-bar h-full bg-neutral-100 shadow-lg" style="width: 80%"></div>
+                <div class="flex justify-between text-[10px] text-neutral-400 font-bold uppercase">
+                    <span>尊嚴指數</span>
+                    <span id="val-dignity">80</span>
+                </div>
+                <div class="h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+                    <div id="bar-dignity" class="value-bar bg-white shadow-[0_0_8px_rgba(255,255,255,0.3)]" style="width: 80%"></div>
                 </div>
             </div>
             <div class="space-y-1">
-                <span class="text-[9px] text-neutral-400 uppercase font-bold tracking-tighter">家屬負荷</span>
-                <div class="h-2 bg-neutral-900 rounded-full overflow-hidden">
-                    <div id="bar-burden" class="value-bar h-full bg-red-600 shadow-lg" style="width: 80%"></div>
+                <div class="flex justify-between text-[10px] text-neutral-400 font-bold uppercase">
+                    <span>家屬負荷</span>
+                    <span id="val-burden">80</span>
+                </div>
+                <div class="h-1.5 bg-neutral-900 rounded-full overflow-hidden">
+                    <div id="bar-burden" class="value-bar bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" style="width: 80%"></div>
                 </div>
             </div>
         </div>
@@ -124,7 +139,6 @@
         <section id="prologue" class="stage active fade-in space-y-8 text-center">
             <div class="glass-panel space-y-6">
                 <h1 class="serif text-3xl font-bold text-white tracking-widest leading-relaxed">面對年輕型失智症<br><span class="text-xl opacity-60 italic">消失的時光</span></h1>
-                
                 <div class="space-y-4 text-neutral-300 font-light leading-relaxed">
                     <p>一場意外車禍，醫生的拼命治療，讓他留在這個世界。</p>
                     <p>但隨之而來的，是記憶的緩慢淡去。</p>
@@ -164,18 +178,14 @@
             </div>
         </section>
 
-        <!-- 遊戲核心區段 -->
+        <!-- 遊戲核心 -->
         <section id="game" class="stage">
             <div class="glass-panel space-y-6 relative">
                 <div class="flex justify-between items-start border-b border-white/10 pb-4 mb-2">
-                    <div class="space-y-1">
-                        <h3 id="scen-title" class="serif text-2xl text-white font-bold"></h3>
-                    </div>
+                    <h3 id="scen-title" class="serif text-2xl text-white font-bold"></h3>
                 </div>
-                
                 <p id="scen-desc" class="text-base text-neutral-200 font-light leading-relaxed"></p>
-
-                <div id="game-content" class="opacity-0 transition-opacity duration-1000 space-y-3">
+                <div id="game-content" class="opacity-0 transition-opacity duration-700 space-y-3">
                     <div id="scen-options" class="space-y-3"></div>
                 </div>
             </div>
@@ -185,9 +195,7 @@
         <section id="ending" class="stage text-center">
             <div class="glass-panel space-y-10">
                 <h2 id="ending-title" class="serif text-5xl text-white">無解的終局</h2>
-                <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed">
-                    <p>這就是年輕型失智症家屬每天都將面臨的。</p>
-                </div>
+                <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed"></div>
                 <button onclick="location.reload()" class="px-10 py-3 border border-white/20 text-neutral-400 hover:text-white hover:border-white transition-all text-xs tracking-[0.3em] rounded-full">
                     重啟人生
                 </button>
@@ -196,11 +204,11 @@
 
     </main>
 
-    <!-- 反饋遮罩 -->
+    <!-- 反饋 -->
     <div id="feedback-overlay">
         <div class="max-w-xs space-y-10">
             <p id="feedback-text" class="text-xl text-white font-light serif leading-relaxed italic"></p>
-            <button onclick="nextScenario()" class="next-btn-anim text-xs tracking-[0.4em] text-white/60 hover:text-white uppercase">
+            <button id="next-btn" onclick="nextScenario()" class="next-btn-anim text-xs tracking-[0.4em] text-white/60 hover:text-white uppercase">
                 下一個抉擇 ➜
             </button>
         </div>
@@ -264,6 +272,36 @@
         ];
 
         const bgImg = document.getElementById('global-bg');
+        const bgVid = document.getElementById('global-video');
+
+        function updateBackground(type, index) {
+            const fileName = index === 0 ? 'start' : `scene${index}`;
+            const imgPath = `./pic/${fileName}.png`;
+            const vidPath = `./pic/${fileName}.mp4`;
+
+            // 先把兩者都隱藏
+            bgImg.style.opacity = '0';
+            bgVid.style.opacity = '0';
+
+            // 試著切換背景 (邏輯：優先顯示影片，如果影片載入失敗或不播放則退回圖片)
+            // 在實際環境中，為了穩定性，我們讓開發者決定使用哪種。這裡我們動態偵測。
+            
+            // 更新圖片源
+            bgImg.src = imgPath;
+            bgImg.style.opacity = '1';
+
+            // 嘗試播放影片 (非強制)
+            bgVid.src = vidPath;
+            bgVid.load();
+            bgVid.play().then(() => {
+                bgVid.style.opacity = '1';
+                bgImg.style.opacity = '0'; // 如果影片成功，隱藏圖片
+            }).catch(() => {
+                // 影片失敗沒關係，圖片已經在那裡了
+                bgVid.style.opacity = '0';
+                bgImg.style.opacity = '1';
+            });
+        }
 
         function hideAll() {
             document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
@@ -301,20 +339,8 @@
             const content = document.getElementById('game-content');
             content.style.opacity = '0';
             
-            // 切換全螢幕背景 - 副檔名改為 png
-            const sceneNum = state.currentIdx + 1;
-            const imagePath = `./pic/scene${sceneNum}.png`;
-            
-            bgImg.style.opacity = '0';
-            setTimeout(() => {
-                bgImg.src = imagePath;
-                bgImg.style.opacity = '1';
-                bgImg.classList.add('bg-zoom');
-                
-                setTimeout(() => {
-                    content.style.opacity = '1';
-                }, 300);
-            }, 500);
+            // 更新背景
+            updateBackground('scene', state.currentIdx + 1);
 
             document.getElementById('scen-title').innerText = sc.title;
             document.getElementById('scen-desc').innerText = sc.desc;
@@ -323,11 +349,15 @@
             optBox.innerHTML = '';
             sc.options.forEach((o, i) => {
                 const b = document.createElement('button');
-                b.className = 'w-full text-left bg-white/5 border border-white/10 p-4 rounded-lg text-sm leading-relaxed hover:bg-white hover:text-black transition-all duration-300';
+                b.className = 'w-full text-left bg-white/5 border border-white/10 p-5 rounded-xl text-sm leading-relaxed hover:bg-white hover:text-black hover:scale-[1.02] transition-all duration-300';
                 b.innerText = o.text;
                 b.onclick = () => handleChoice(i);
                 optBox.appendChild(b);
             });
+
+            setTimeout(() => {
+                content.style.opacity = '1';
+            }, 500);
         }
 
         function handleChoice(idx) {
@@ -347,7 +377,9 @@
         function refreshBars() {
             ['patient', 'dignity', 'burden'].forEach(k => {
                 const bar = document.getElementById('bar-' + k);
+                const val = document.getElementById('val-' + k);
                 if (bar) bar.style.width = state[k] + '%';
+                if (val) val.innerText = state[k];
             });
             
             if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
@@ -371,9 +403,14 @@
             document.getElementById('ending-title').innerText = "漫長告別的開始";
             document.getElementById('ending-desc').innerHTML = `
                 <p>五個抉擇，僅是家屬生活中的幾秒鐘。</p>
-                <p>面對無法痊癒的疾病，我們需要的可能不只是選擇，<br>恢復尊嚴與支持。</p>
+                <p>面對無法痊癒的疾病，我們需要的可能不只是選擇，<br>而是社會整體的恢復尊嚴與支持。</p>
             `;
         }
+
+        // 初始背景
+        window.onload = () => {
+            updateBackground('start', 0);
+        };
     </script>
 </body>
 </html>
