@@ -1,681 +1,348 @@
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>貸款與租房比較工具</title>
-  <style>
-    :root {
-      --bg: #f5f7fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #dbe2ea;
-      --primary: #2563eb;
-      --primary-soft: #dbeafe;
-      --good: #0f766e;
-      --bad: #b91c1c;
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-      --radius: 16px;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    h1 {
-      font-size: 32px;
-      margin: 0 0 8px;
-    }
-
-    .subtitle {
-      margin: 0 0 24px;
-      color: var(--muted);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-
-    .panel {
-      padding: 20px;
-      position: sticky;
-      top: 20px;
-    }
-
-    .panel h2,
-    .results h2 {
-      margin: 0 0 16px;
-      font-size: 20px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      margin: 20px 0 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .field {
-      margin-bottom: 14px;
-    }
-
-    .field label {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 14px;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-
-    .hint {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    input[type="number"], select {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      font-size: 15px;
-      outline: none;
-      background: white;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    button {
-      appearance: none;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .primary {
-      background: var(--primary);
-      color: white;
-      flex: 1;
-    }
-
-    .secondary {
-      background: #eef2f7;
-      color: var(--text);
-    }
-
-    .results {
-      padding: 20px;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .summary-box {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 16px;
-      background: #fcfdff;
-    }
-
-    .summary-box .label {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .summary-box .value {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .good { color: var(--good); }
-    .bad { color: var(--bad); }
-
-    .chart-wrap {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 16px;
-      background: white;
-      margin-bottom: 18px;
-    }
-
-    canvas {
-      width: 100%;
-      height: 320px;
-      display: block;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 880px;
-      background: white;
-    }
-
-    thead {
-      background: #f8fafc;
-    }
-
-    th, td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
-      text-align: right;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-
-    th:first-child, td:first-child { text-align: center; }
-    th:nth-child(2), td:nth-child(2), th:nth-child(3), td:nth-child(3) { text-align: right; }
-
-    .winner-rent {
-      background: rgba(15, 118, 110, 0.06);
-    }
-
-    .winner-buy {
-      background: rgba(37, 99, 235, 0.08);
-    }
-
-    .note {
-      margin-top: 14px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--primary-soft);
-      color: var(--primary);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    @media (max-width: 980px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .panel {
-        position: static;
-      }
-
-      .summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 640px) {
-      .container {
-        padding: 16px;
-      }
-
-      h1 {
-        font-size: 26px;
-      }
-
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>貸款與租房比較工具</h1>
-    <p class="subtitle">比較多年期內「租房」與「買房貸款」的總支出、淨資產與每年差異。</p>
-
-    <div class="grid">
-      <div class="card panel">
-        <div class="badge">獨立 HTML｜可直接存成 .html 開啟</div>
-        <h2>輸入條件</h2>
-
-        <div class="section-title">租房參數</div>
-        <div class="field">
-          <label>
-            <span>每月租金</span>
-            <span class="hint">元</span>
-          </label>
-          <input id="monthlyRent" type="number" value="25000" min="0" step="1000" />
-        </div>
-        <div class="field">
-          <label>
-            <span>年租金漲幅</span>
-            <span class="hint">%</span>
-          </label>
-          <input id="rentGrowth" type="number" value="2" min="0" step="0.1" />
-        </div>
-
-        <div class="section-title">買房參數</div>
-        <div class="field">
-          <label>
-            <span>房價</span>
-            <span class="hint">元</span>
-          </label>
-          <input id="housePrice" type="number" value="12000000" min="0" step="100000" />
-        </div>
-        <div class="field">
-          <label>
-            <span>自備款比例</span>
-            <span class="hint">%</span>
-          </label>
-          <input id="downPaymentRate" type="number" value="20" min="0" max="100" step="1" />
-        </div>
-        <div class="field">
-          <label>
-            <span>貸款利率</span>
-            <span class="hint">年利率 %</span>
-          </label>
-          <input id="interestRate" type="number" value="2.2" min="0" step="0.01" />
-        </div>
-        <div class="field">
-          <label>
-            <span>貸款年限</span>
-            <span class="hint">年</span>
-          </label>
-          <input id="loanYears" type="number" value="30" min="1" step="1" />
-        </div>
-        <div class="field">
-          <label>
-            <span>每年持有成本</span>
-            <span class="hint">稅、管理、維修</span>
-          </label>
-          <input id="annualOwnershipCost" type="number" value="60000" min="0" step="1000" />
-        </div>
-        <div class="field">
-          <label>
-            <span>房價年增率</span>
-            <span class="hint">%</span>
-          </label>
-          <input id="houseGrowth" type="number" value="1.5" min="-20" step="0.1" />
-        </div>
-
-        <div class="section-title">比較設定</div>
-        <div class="field">
-          <label>
-            <span>比較年數</span>
-            <span class="hint">1–40 年</span>
-          </label>
-          <input id="compareYears" type="number" value="15" min="1" max="40" step="1" />
-        </div>
-
-        <div class="btn-row">
-          <button class="primary" id="calculateBtn">重新計算</button>
-          <button class="secondary" id="presetBtn">載入範例</button>
-        </div>
-      </div>
-
-      <div class="card results">
-        <h2>比較結果</h2>
-        <div class="summary-grid">
-          <div class="summary-box">
-            <div class="label">租房總支出</div>
-            <div class="value" id="totalRentCost">—</div>
-          </div>
-          <div class="summary-box">
-            <div class="label">買房總現金流出</div>
-            <div class="value" id="totalBuyOutflow">—</div>
-          </div>
-          <div class="summary-box">
-            <div class="label">期末房屋淨資產</div>
-            <div class="value" id="buyEquity">—</div>
-          </div>
-          <div class="summary-box">
-            <div class="label">結論</div>
-            <div class="value" id="finalDecision">—</div>
-          </div>
-        </div>
-
-        <div class="chart-wrap">
-          <canvas id="comparisonChart" width="900" height="320"></canvas>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>年份</th>
-                <th>當年租金支出</th>
-                <th>累計租房支出</th>
-                <th>當年房貸本息</th>
-                <th>當年持有成本</th>
-                <th>累計買房流出</th>
-                <th>剩餘貸款</th>
-                <th>房屋估值</th>
-                <th>房屋淨資產</th>
-                <th>較有利方案</th>
-              </tr>
-            </thead>
-            <tbody id="resultTableBody"></tbody>
-          </table>
-        </div>
-
-        <div class="note" id="noteText"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const $ = (id) => document.getElementById(id);
-
-    const fmtCurrency = (num) => {
-      return new Intl.NumberFormat('zh-TW', {
-        style: 'currency',
-        currency: 'TWD',
-        maximumFractionDigits: 0
-      }).format(num);
-    };
-
-    const fmtNumber = (num) => {
-      return new Intl.NumberFormat('zh-TW', {
-        maximumFractionDigits: 0
-      }).format(num);
-    };
-
-    function getInputs() {
-      return {
-        monthlyRent: parseFloat($("monthlyRent").value) || 0,
-        rentGrowth: (parseFloat($("rentGrowth").value) || 0) / 100,
-        housePrice: parseFloat($("housePrice").value) || 0,
-        downPaymentRate: (parseFloat($("downPaymentRate").value) || 0) / 100,
-        interestRate: (parseFloat($("interestRate").value) || 0) / 100,
-        loanYears: parseInt($("loanYears").value) || 1,
-        annualOwnershipCost: parseFloat($("annualOwnershipCost").value) || 0,
-        houseGrowth: (parseFloat($("houseGrowth").value) || 0) / 100,
-        compareYears: Math.min(40, Math.max(1, parseInt($("compareYears").value) || 1))
-      };
-    }
-
-    function calcMonthlyPayment(principal, annualRate, years) {
-      const months = years * 12;
-      const monthlyRate = annualRate / 12;
-
-      if (months <= 0) return 0;
-      if (monthlyRate === 0) return principal / months;
-
-      return principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
-    }
-
-    function generateData(inputs) {
-      const downPayment = inputs.housePrice * inputs.downPaymentRate;
-      const loanPrincipal = Math.max(0, inputs.housePrice - downPayment);
-      const monthlyPayment = calcMonthlyPayment(loanPrincipal, inputs.interestRate, inputs.loanYears);
-      const loanMonths = inputs.loanYears * 12;
-      const compareMonths = inputs.compareYears * 12;
-      const monthlyRate = inputs.interestRate / 12;
-
-      let remainingLoan = loanPrincipal;
-      let cumulativeRent = 0;
-      let cumulativeBuy = downPayment;
-      let rows = [];
-      let rentSeries = [];
-      let buySeries = [];
-      let equitySeries = [];
-
-      for (let year = 1; year <= inputs.compareYears; year++) {
-        const annualRent = inputs.monthlyRent * 12 * Math.pow(1 + inputs.rentGrowth, year - 1);
-        cumulativeRent += annualRent;
-
-        let annualMortgagePayment = 0;
-        for (let m = 1; m <= 12; m++) {
-          const currentMonth = (year - 1) * 12 + m;
-          if (currentMonth <= loanMonths && remainingLoan > 0.5) {
-            if (monthlyRate === 0) {
-              const principalPaid = Math.min(remainingLoan, monthlyPayment);
-              remainingLoan -= principalPaid;
-              annualMortgagePayment += principalPaid;
-            } else {
-              const interest = remainingLoan * monthlyRate;
-              const principalPaid = Math.min(remainingLoan, monthlyPayment - interest);
-              remainingLoan -= principalPaid;
-              annualMortgagePayment += (principalPaid + interest);
-            }
-          }
-        }
-
-        const annualOwnershipCost = inputs.annualOwnershipCost;
-        cumulativeBuy += annualMortgagePayment + annualOwnershipCost;
-
-        const currentHouseValue = inputs.housePrice * Math.pow(1 + inputs.houseGrowth, year);
-        const equity = currentHouseValue - Math.max(0, remainingLoan);
-
-        const rentNetCost = cumulativeRent;
-        const buyNetCost = cumulativeBuy - equity;
-        const winner = buyNetCost < rentNetCost ? '買房較有利' : (buyNetCost > rentNetCost ? '租房較有利' : '兩者接近');
-
-        rows.push({
-          year,
-          annualRent,
-          cumulativeRent,
-          annualMortgagePayment,
-          annualOwnershipCost,
-          cumulativeBuy,
-          remainingLoan: Math.max(0, remainingLoan),
-          currentHouseValue,
-          equity,
-          winner,
-          rentNetCost,
-          buyNetCost
-        });
-
-        rentSeries.push(cumulativeRent);
-        buySeries.push(cumulativeBuy);
-        equitySeries.push(equity);
-      }
-
-      return {
-        downPayment,
-        loanPrincipal,
-        monthlyPayment,
-        rows
-      };
-    }
-
-    function renderSummary(data) {
-      const last = data.rows[data.rows.length - 1];
-      const buyNetCost = last.cumulativeBuy - last.equity;
-      const diff = Math.abs(last.cumulativeRent - buyNetCost);
-      const isBuyBetter = buyNetCost < last.cumulativeRent;
-
-      $("totalRentCost").textContent = fmtCurrency(last.cumulativeRent);
-      $("totalBuyOutflow").textContent = fmtCurrency(last.cumulativeBuy);
-      $("buyEquity").textContent = fmtCurrency(last.equity);
-
-      const decisionEl = $("finalDecision");
-      decisionEl.textContent = isBuyBetter
-        ? `買房省 ${fmtNumber(diff)} 元`
-        : `租房省 ${fmtNumber(diff)} 元`;
-      decisionEl.className = `value ${isBuyBetter ? 'good' : 'bad'}`;
-
-      $("noteText").textContent = `說明：此工具以「租房累計支出」對比「買房累計現金流出 - 期末房屋淨資產」做比較。買房現金流出包含自備款、房貸本息與每年持有成本。未納入投資報酬、機會成本、稅制細節、裝潢與交易成本，因此適合做初步估算，不適合作為最終購屋決策依據。貸款月付金約為 ${fmtCurrency(data.monthlyPayment)}。`;
-    }
-
-    function renderTable(data) {
-      const tbody = $("resultTableBody");
-      tbody.innerHTML = "";
-
-      data.rows.forEach((row) => {
-        const tr = document.createElement('tr');
-        tr.className = row.winner === '租房較有利' ? 'winner-rent' : (row.winner === '買房較有利' ? 'winner-buy' : '');
-        tr.innerHTML = `
-          <td>${row.year}</td>
-          <td>${fmtCurrency(row.annualRent)}</td>
-          <td>${fmtCurrency(row.cumulativeRent)}</td>
-          <td>${fmtCurrency(row.annualMortgagePayment)}</td>
-          <td>${fmtCurrency(row.annualOwnershipCost)}</td>
-          <td>${fmtCurrency(row.cumulativeBuy)}</td>
-          <td>${fmtCurrency(row.remainingLoan)}</td>
-          <td>${fmtCurrency(row.currentHouseValue)}</td>
-          <td>${fmtCurrency(row.equity)}</td>
-          <td>${row.winner}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderChart(data) {
-      const canvas = $("comparisonChart");
-      const ctx = canvas.getContext('2d');
-      const dpr = window.devicePixelRatio || 1;
-      const cssWidth = canvas.clientWidth || 900;
-      const cssHeight = 320;
-      canvas.width = cssWidth * dpr;
-      canvas.height = cssHeight * dpr;
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, cssWidth, cssHeight);
-
-      const padding = { top: 20, right: 20, bottom: 40, left: 70 };
-      const plotW = cssWidth - padding.left - padding.right;
-      const plotH = cssHeight - padding.top - padding.bottom;
-
-      const rentValues = data.rows.map(r => r.cumulativeRent);
-      const buyNetValues = data.rows.map(r => r.cumulativeBuy - r.equity);
-      const all = [...rentValues, ...buyNetValues];
-      const maxVal = Math.max(...all, 1);
-
-      const x = (i) => padding.left + (plotW * i / Math.max(1, data.rows.length - 1));
-      const y = (v) => padding.top + plotH - (v / maxVal) * plotH;
-
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(padding.left, padding.top);
-      ctx.lineTo(padding.left, padding.top + plotH);
-      ctx.lineTo(padding.left + plotW, padding.top + plotH);
-      ctx.stroke();
-
-      for (let i = 0; i <= 4; i++) {
-        const value = maxVal * i / 4;
-        const yy = y(value);
-        ctx.strokeStyle = '#e5e7eb';
-        ctx.beginPath();
-        ctx.moveTo(padding.left, yy);
-        ctx.lineTo(padding.left + plotW, yy);
-        ctx.stroke();
-
-        ctx.fillStyle = '#6b7280';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText(fmtNumber(value), padding.left - 8, yy + 4);
-      }
-
-      function drawLine(values, color) {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        values.forEach((v, i) => {
-          if (i === 0) ctx.moveTo(x(i), y(v));
-          else ctx.lineTo(x(i), y(v));
-        });
-        ctx.stroke();
-
-        values.forEach((v, i) => {
-          ctx.fillStyle = color;
-          ctx.beginPath();
-          ctx.arc(x(i), y(v), 3.5, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
-
-      drawLine(rentValues, '#0f766e');
-      drawLine(buyNetValues, '#2563eb');
-
-      ctx.fillStyle = '#111827';
-      ctx.font = '12px sans-serif';
-      ctx.textAlign = 'center';
-      data.rows.forEach((row, i) => {
-        ctx.fillText(`${row.year}年`, x(i), padding.top + plotH + 20);
-      });
-
-      ctx.fillStyle = '#0f766e';
-      ctx.fillRect(padding.left, 4, 14, 14);
-      ctx.fillStyle = '#111827';
-      ctx.textAlign = 'left';
-      ctx.fillText('租房累計支出', padding.left + 20, 16);
-
-      ctx.fillStyle = '#2563eb';
-      ctx.fillRect(padding.left + 130, 4, 14, 14);
-      ctx.fillStyle = '#111827';
-      ctx.fillText('買房淨成本（累計流出 - 淨資產）', padding.left + 150, 16);
-    }
-
-    function calculate() {
-      const inputs = getInputs();
-      const data = generateData(inputs);
-      renderSummary(data);
-      renderTable(data);
-      renderChart(data);
-    }
-
-    $("calculateBtn").addEventListener('click', calculate);
-
-    $("presetBtn").addEventListener('click', () => {
-      $("monthlyRent").value = 28000;
-      $("rentGrowth").value = 2;
-      $("housePrice").value = 15000000;
-      $("downPaymentRate").value = 20;
-      $("interestRate").value = 2.35;
-      $("loanYears").value = 30;
-      $("annualOwnershipCost").value = 80000;
-      $("houseGrowth").value = 2;
-      $("compareYears").value = 20;
-      calculate();
-    });
-
-    window.addEventListener('resize', calculate);
-    calculate();
-  </script>
-</body>
-</html>
-
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..719807ecec0e0c69b92a3be80e6be5f46703590f
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,338 @@
++<!DOCTYPE html>
++<html lang="zh-Hant">
++<head>
++  <meta charset="UTF-8" />
++  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++  <title>年輕型失智症患者的生活困境</title>
++  <script src="https://cdn.tailwindcss.com"></script>
++  <link rel="preconnect" href="https://fonts.googleapis.com">
++  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
++  <style>
++    body {
++      background: #000000;
++      color: #d4d4d4;
++      font-family: 'Noto Sans TC', sans-serif;
++      min-height: 100vh;
++    }
++    .serif { font-family: 'Noto Serif TC', serif; }
++    .fade-in {
++      animation: fadeIn 0.8s ease forwards;
++    }
++    @keyframes fadeIn {
++      from { opacity: 0; transform: translateY(10px); }
++      to { opacity: 1; transform: translateY(0); }
++    }
++    .value-bar {
++      transition: width 700ms ease, background-color 700ms ease;
++    }
++    .next-arrow {
++      animation: pulseArrow 1.2s infinite;
++    }
++    @keyframes pulseArrow {
++      0%,100% { transform: translateX(0); opacity: 0.6; }
++      50% { transform: translateX(6px); opacity: 1; }
++    }
++  </style>
++</head>
++<body class="bg-black text-neutral-300">
++  <main class="max-w-xl mx-auto px-5 py-8 min-h-screen flex items-center justify-center">
++    <section id="app" class="w-full">
++
++      <div id="prologue" class="stage fade-in space-y-6 text-center">
++        <h1 class="serif text-3xl font-bold tracking-wide text-neutral-100">年輕型失智症患者的生活困境</h1>
++        <!-- video placeholder -->
++        <img src="IMAGE_PLACEHOLDER" alt="紀實影像預留" class="w-full h-48 object-cover bg-neutral-900 border border-neutral-800" />
++        <div class="space-y-3 leading-relaxed text-neutral-300">
++          <p>一場車禍，讓他活了下來。</p>
++          <p>接著，記憶開始斷裂。</p>
++          <p>名字、時間、回家的路，逐漸從腦海滑落。</p>
++          <p class="serif text-neutral-100">醫生最後說：阿茲海默症。</p>
++        </div>
++        <button id="toIntro" class="w-full py-3 border border-neutral-600 text-neutral-100 hover:bg-neutral-900 transition">事情從這裡開始失控</button>
++      </div>
++
++      <div id="intro" class="stage hidden fade-in space-y-8 text-center">
++        <h2 class="serif text-2xl text-neutral-100">你認為最年輕的失智症患者幾歲？</h2>
++        <div class="grid grid-cols-2 gap-3">
++          <button class="age-option py-4 border border-neutral-700 hover:bg-neutral-900" data-age="30">30</button>
++          <button class="age-option py-4 border border-neutral-700 hover:bg-neutral-900" data-age="40">40</button>
++          <button class="age-option py-4 border border-neutral-700 hover:bg-neutral-900" data-age="50">50</button>
++          <button class="age-option py-4 border border-neutral-700 hover:bg-neutral-900" data-age="60">60</button>
++        </div>
++      </div>
++
++      <div id="answer" class="stage hidden fade-in space-y-6 text-center">
++        <p class="text-sm tracking-widest text-neutral-500">答案</p>
++        <h2 class="serif text-6xl text-neutral-100">19歲</h2>
++        <p class="leading-relaxed text-neutral-300">這不是個案，而是制度尚未準備好的現實。</p>
++        <button id="toGame" class="w-full py-3 border border-neutral-600 text-neutral-100 hover:bg-neutral-900 transition">接手這個家庭的決定權</button>
++      </div>
++
++      <div id="game" class="stage hidden fade-in space-y-6">
++        <header class="space-y-3">
++          <h2 class="serif text-2xl text-neutral-100 text-center">你是家屬</h2>
++          <div class="space-y-3 text-sm">
++            <div>
++              <div class="flex justify-between mb-1"><span>患者狀態</span><span id="patientValue">80</span></div>
++              <div class="h-2 bg-neutral-800"><div id="patientBar" class="value-bar h-2 bg-neutral-300" style="width:80%"></div></div>
++            </div>
++            <div>
++              <div class="flex justify-between mb-1"><span>自尊</span><span id="dignityValue">80</span></div>
++              <div class="h-2 bg-neutral-800"><div id="dignityBar" class="value-bar h-2 bg-neutral-400" style="width:80%"></div></div>
++            </div>
++            <div>
++              <div class="flex justify-between mb-1"><span>家屬負荷</span><span id="burdenValue">80</span></div>
++              <div class="h-2 bg-neutral-800"><div id="burdenBar" class="value-bar h-2 bg-neutral-500" style="width:80%"></div></div>
++            </div>
++          </div>
++        </header>
++
++        <article id="scenarioCard" class="space-y-4 border border-neutral-800 p-4">
++          <h3 id="scenarioTitle" class="serif text-xl text-neutral-100"></h3>
++          <p id="scenarioDesc" class="leading-relaxed text-neutral-300"></p>
++          <div id="options" class="space-y-3"></div>
++        </article>
++
++        <div id="feedbackBox" class="hidden border border-neutral-700 p-4 space-y-4 fade-in">
++          <p id="feedbackText" class="leading-relaxed text-neutral-200"></p>
++          <button id="nextBtn" class="ml-auto block text-neutral-200 next-arrow">下一步 ➜</button>
++        </div>
++      </div>
++
++      <div id="ending" class="stage hidden fade-in text-center space-y-4">
++        <h2 class="serif text-4xl text-neutral-100">你失敗了。</h2>
++        <p class="text-neutral-300">不是你做錯，而是沒有一個選擇是對的</p>
++        <p class="text-neutral-400">這就是年輕型失智者家庭每天的現實</p>
++      </div>
++
++    </section>
++  </main>
++
++  <script>
++    const stages = {
++      prologue: document.getElementById('prologue'),
++      intro: document.getElementById('intro'),
++      answer: document.getElementById('answer'),
++      game: document.getElementById('game'),
++      ending: document.getElementById('ending')
++    };
++
++    const state = {
++      patient: 80,
++      dignity: 80,
++      burden: 80,
++      currentScenario: 0,
++      awaitingNext: false
++    };
++
++    const scenarios = [
++      {
++        title: '情境1：重複提問（情緒崩潰）',
++        desc: '他在二十分鐘內第七次問你「今天是不是要上班」。你已經兩晚沒睡，語氣開始發抖。你知道這不是他的錯，但你也快撐不住。',
++        options: [
++          {
++            text: '耐著性子再回答一次，陪他一起寫下行程，告訴自己「再一次就好」。你可能守住他的安全感，但你也在把最後的力氣擠乾。',
++            impact: { patient: +12, dignity: +4, burden: -16 },
++            feedback: '他終於稍微安靜，眼神短暫穩定下來。你卻在洗手間裡無聲地哭，因為明天還會重來。'
++          },
++          {
++            text: '提高音量要求他不要再問，試圖用強硬方式中斷循環。你知道這會傷人，但你真的怕自己先崩潰。',
++            impact: { patient: -10, dignity: -15, burden: +8 },
++            feedback: '他沉默了，像被突然推遠。家裡安靜了，但那份安靜像懲罰。'
++          },
++          {
++            text: '先離開房間五分鐘，讓自己喘口氣，再回來處理。你保護了自己的神經，但他可能在你離開時更慌。',
++            impact: { patient: -6, dignity: -4, burden: +12 },
++            feedback: '你沒有當場爆炸，卻聽見他在房裡反覆喊你的名字。那五分鐘像偷來的，也像欠下的。'
++          }
++        ]
++      },
++      {
++        title: '情境2：想工作但被社會拒絕',
++        desc: '他堅持「我還能上班」，投了履歷卻一直被婉拒。面試回來後，他問你是不是也覺得他沒用了。',
++        options: [
++          {
++            text: '支持他繼續找工作，幫他修履歷、陪他面試，哪怕你知道被拒絕的機率很高。你想守住他的身份感。',
++            impact: { patient: +6, dignity: +14, burden: -12 },
++            feedback: '他久違地挺直背說「我還可以」。但每一次拒信都像慢慢磨掉你們共同的希望。'
++          },
++          {
++            text: '勸他先不要工作，改做日間活動與復健。你是為了降低風險，卻也像親手宣布他的社會角色終止。',
++            impact: { patient: +10, dignity: -14, burden: +6 },
++            feedback: '生活變得可控一些，他卻在晚餐時一直盯著空白的名片盒。'
++          },
++          {
++            text: '替他隱瞞病情去爭取短期工作機會。你明知不誠實，但想給他一次被正常看待的可能。',
++            impact: { patient: -8, dignity: +10, burden: -10 },
++            feedback: '他拿到機會時眼裡有光，卻在第一週就因失誤被質疑。你開始害怕下一通電話。'
++          }
++        ]
++      },
++      {
++        title: '情境3：公共失控（超市崩潰）',
++        desc: '在超市排隊時，他突然把商品摔在地上，對陌生人大吼「你偷了我的東西」。所有人都看著你。',
++        options: [
++          {
++            text: '立刻抱住他、反覆安撫，承受旁人的指指點點，慢慢把他帶離現場。你保護了他，但自己像被公開審判。',
++            impact: { patient: +10, dignity: +2, burden: -14 },
++            feedback: '他在你懷裡顫抖著平靜下來。你聽見背後有人說「管好家人」，胸口像被壓住。'
++          },
++          {
++            text: '強硬制止並直接拖離現場，優先終止危機。你知道這會讓他更羞辱，但你怕場面失控傷到人。',
++            impact: { patient: -12, dignity: -12, burden: +10 },
++            feedback: '風暴很快結束，他一路沉默不看你。回家後，他把自己鎖在房裡。'
++          },
++          {
++            text: '請店員與路人協助，公開說明他生病了。你換來一些理解，也把他的私密脆弱暴露在人群裡。',
++            impact: { patient: +4, dignity: -10, burden: +8 },
++            feedback: '有人點頭幫忙，也有人拿起手機。你突然分不清，自己是在求救還是在求饒。'
++          }
++        ]
++      },
++      {
++        title: '情境4：制度漏洞（未達失能）',
++        desc: '評估結果寫著「未達失能標準」，補助申請被退回。你明知他已無法獨立生活，卻卡在一紙行政定義。',
++        options: [
++          {
++            text: '繼續跑流程、蒐集更多病歷、反覆申覆。你為長期資源而戰，但每一次奔波都在透支你。',
++            impact: { patient: +6, dignity: +6, burden: -18 },
++            feedback: '你離制度更近一步，也離睡眠更遠一步。文件越厚，你越像在證明一場看不見的災難。'
++          },
++          {
++            text: '先放棄申請，改用家中存款自費照護。你能立刻穩住生活，但經濟壓力開始吞噬未來。',
++            impact: { patient: +8, dignity: +2, burden: -14 },
++            feedback: '照護品質暫時提升，你卻在深夜反覆計算還能撐幾個月。'
++          },
++          {
++            text: '讓他在評估時「表現真實失能狀態」，甚至暗示不要硬撐。你想換到資源，但也像逼他放下最後體面。',
++            impact: { patient: -6, dignity: -16, burden: +10 },
++            feedback: '申請可能有轉機，他卻低聲問你：「你也覺得我已經沒用了嗎？」'
++          }
++        ]
++      },
++      {
++        title: '情境5：照顧者崩潰（是否送機構）',
++        desc: '你連續失眠、出現胸悶與恐慌。醫師警告你再撐下去可能先倒下。你必須決定是否把他送進機構。',
++        options: [
++          {
++            text: '送機構，要求專業團隊接手。你保住彼此生理安全，卻承擔他可能感到被遺棄的痛。',
++            impact: { patient: +8, dignity: -14, burden: +18 },
++            feedback: '你的身體終於能休息，但探視時他問「你是不是不要我了」，你無法回答。'
++          },
++          {
++            text: '堅持在家照顧到底，不把他交出去。你守住承諾，卻把自己推向崩潰邊緣。',
++            impact: { patient: +10, dignity: +8, burden: -24 },
++            feedback: '他握著你的手睡著了。凌晨三點，你在廚房發抖，突然想不起上次完整睡眠是何時。'
++          },
++          {
++            text: '白天送日照、夜晚自己照顧，折衷分擔。你試圖兩邊都守住，但兩邊都可能不滿。',
++            impact: { patient: +4, dignity: +2, burden: -10 },
++            feedback: '生活暫時有了節奏，可你每天都在時間表與愧疚感中拔河。'
++          }
++        ]
++      }
++    ];
++
++    function showStage(name) {
++      Object.values(stages).forEach(el => el.classList.add('hidden'));
++      stages[name].classList.remove('hidden');
++      stages[name].classList.remove('fade-in');
++      void stages[name].offsetWidth;
++      stages[name].classList.add('fade-in');
++    }
++
++    function updateBars() {
++      const mappings = [
++        ['patient', 'patientBar', 'patientValue'],
++        ['dignity', 'dignityBar', 'dignityValue'],
++        ['burden', 'burdenBar', 'burdenValue']
++      ];
++      mappings.forEach(([key, barId, valueId]) => {
++        const value = Math.max(0, Math.min(100, state[key]));
++        document.getElementById(barId).style.width = value + '%';
++        document.getElementById(valueId).textContent = Math.round(value);
++      });
++    }
++
++    function renderScenario() {
++      const scenario = scenarios[state.currentScenario];
++      if (!scenario) {
++        showStage('ending');
++        return;
++      }
++
++      document.getElementById('scenarioTitle').textContent = scenario.title;
++      document.getElementById('scenarioDesc').textContent = scenario.desc;
++
++      const optionsWrap = document.getElementById('options');
++      optionsWrap.innerHTML = '';
++
++      scenario.options.forEach((opt, idx) => {
++        const btn = document.createElement('button');
++        btn.className = 'w-full text-left border border-neutral-700 hover:bg-neutral-900 p-3 leading-relaxed text-sm';
++        btn.textContent = opt.text;
++        btn.addEventListener('click', () => chooseOption(idx));
++        optionsWrap.appendChild(btn);
++      });
++
++      document.getElementById('feedbackBox').classList.add('hidden');
++      state.awaitingNext = false;
++    }
++
++    function chooseOption(index) {
++      if (state.awaitingNext) return;
++      const scenario = scenarios[state.currentScenario];
++      const opt = scenario.options[index];
++
++      state.patient += opt.impact.patient;
++      state.dignity += opt.impact.dignity;
++      state.burden += opt.impact.burden;
++      updateBars();
++
++      const feedbackBox = document.getElementById('feedbackBox');
++      const feedbackText = document.getElementById('feedbackText');
++      feedbackText.textContent = opt.feedback;
++      feedbackBox.classList.remove('hidden');
++      feedbackBox.classList.remove('fade-in');
++      void feedbackBox.offsetWidth;
++      feedbackBox.classList.add('fade-in');
++
++      Array.from(document.querySelectorAll('#options button')).forEach(b => b.disabled = true);
++      state.awaitingNext = true;
++
++      if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
++        document.getElementById('nextBtn').textContent = '走向結局 ➜';
++      } else {
++        document.getElementById('nextBtn').textContent = '下一步 ➜';
++      }
++    }
++
++    document.getElementById('nextBtn').addEventListener('click', () => {
++      if (!state.awaitingNext) return;
++      if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
++        showStage('ending');
++        return;
++      }
++      state.currentScenario += 1;
++      if (state.currentScenario >= scenarios.length) {
++        showStage('ending');
++      } else {
++        renderScenario();
++      }
++    });
++
++    document.getElementById('toIntro').addEventListener('click', () => showStage('intro'));
++
++    document.querySelectorAll('.age-option').forEach(btn => {
++      btn.addEventListener('click', () => showStage('answer'));
++    });
++
++    document.getElementById('toGame').addEventListener('click', () => {
++      showStage('game');
++      updateBars();
++      renderScenario();
++    });
++  </script>
++</body>
++</html>
+ 
+EOF
+)
