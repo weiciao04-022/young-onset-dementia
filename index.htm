@@ -2,361 +2,343 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>年輕型失智症：該如何抉擇</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>年輕型失智症：長夜的抉擇</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-bg: #0a0a0a;
+            --glass: rgba(18, 18, 18, 0.75);
+        }
         body {
-            background: #000000;
+            background: var(--primary-bg);
             color: #f5f5f5;
             font-family: 'Noto Sans TC', sans-serif;
-            min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
         .serif { font-family: 'Noto Serif TC', serif; }
         
-        /* 背景容器與淡入淡出效果 */
         #bg-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            inset: 0;
             z-index: -1;
             background: #000;
         }
 
         .bg-image {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
-            filter: brightness(0.35); /* 稍微降低亮度提升文字可讀性 */
-            transition: opacity 1.2s ease-in-out; /* 淡入淡出時間 */
+            filter: brightness(0.3);
+            transition: opacity 2s ease-in-out;
             opacity: 0;
         }
         .bg-image.active { opacity: 1; }
 
-        .fade-in { animation: fadeIn 1s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* 頂部狀態列優化 */
+        #status-dashboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            padding: 1rem 0.5rem;
+            display: none;
+        }
+        #status-dashboard.active { display: block; }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            text-align: center;
         }
 
-        .value-bar { 
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); 
-            height: 100%;
+        .progress-container {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
         }
 
-        .stage { display: none; }
-        .stage.active { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 20px 0; }
+        .bar { transition: width 1s ease; height: 100%; }
+
+        /* 遊戲排版優化 */
+        .stage { 
+            display: none; 
+            min-height: 100vh;
+            padding: 100px 1.25rem 40px; 
+        }
+        .stage.active { display: flex; flex-direction: column; justify-content: center; }
 
         .glass-panel {
-            background: rgba(10, 10, 10, 0.65);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1.5rem;
-            padding: 2.5rem 2rem;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            padding: 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .btn-option {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.1rem;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+            color: #e0e0e0;
+            text-align: left;
+            margin-bottom: 0.75rem;
+        }
+        .btn-option:active { transform: scale(0.98); background: rgba(255, 255, 255, 0.15); }
+        @media (min-width: 768px) {
+            .btn-option:hover { background: #fff; color: #000; transform: translateX(5px); }
         }
 
         #feedback-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(25px);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 200;
             display: none;
-            flex-direction: column;
+            padding: 2rem;
             align-items: center;
             justify-content: center;
-            padding: 2.5rem;
             text-align: center;
         }
         #feedback-overlay.active { display: flex; }
 
-        .btn-option {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            transition: all 0.3s ease;
-            color: #ddd;
-            text-align: left;
-        }
-        .btn-option:hover {
-            background: rgba(255, 255, 255, 1);
-            color: #000;
-            transform: translateX(8px);
+        /* 動畫 */
+        .fade-up { animation: fadeUp 0.8s ease-out forwards; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <!-- 背景交替層 -->
     <div id="bg-container">
         <img id="bg-img-a" class="bg-image" alt="">
         <img id="bg-img-b" class="bg-image" alt="">
     </div>
 
-    <!-- 狀態列 -->
-    <div id="status-bar" class="fixed top-0 left-0 w-full p-4 bg-black/60 backdrop-blur-lg z-[100] border-b border-white/5 hidden">
-        <div class="max-w-xl mx-auto grid grid-cols-3 gap-6">
-            <div class="space-y-1">
-                <div class="flex justify-between text-[10px] text-neutral-400 font-bold tracking-wider">
-                    <span>患者狀態</span>
-                    <span id="val-patient">80</span>
+    <!-- 增強型狀態面板 -->
+    <div id="status-dashboard">
+        <div class="max-w-lg mx-auto grid grid-cols-3 gap-2 px-2">
+            <div class="stat-card">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-[9px] font-bold text-blue-400">患者</span>
+                    <span id="val-patient" class="text-[10px] text-white">80</span>
                 </div>
-                <div class="h-1 bg-neutral-800 rounded-full overflow-hidden">
-                    <div id="bar-patient" class="value-bar bg-blue-500" style="width: 80%"></div>
-                </div>
-            </div>
-            <div class="space-y-1">
-                <div class="flex justify-between text-[10px] text-neutral-400 font-bold tracking-wider">
-                    <span>尊嚴指數</span>
-                    <span id="val-dignity">80</span>
-                </div>
-                <div class="h-1 bg-neutral-800 rounded-full overflow-hidden">
-                    <div id="bar-dignity" class="value-bar bg-white" style="width: 80%"></div>
+                <div class="progress-container">
+                    <div id="bar-patient" class="bar bg-blue-500" style="width: 80%"></div>
                 </div>
             </div>
-            <div class="space-y-1">
-                <div class="flex justify-between text-[10px] text-neutral-400 font-bold tracking-wider">
-                    <span>家屬負荷</span>
-                    <span id="val-burden">80</span>
+            <div class="stat-card">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-[9px] font-bold text-stone-300">尊嚴</span>
+                    <span id="val-dignity" class="text-[10px] text-white">80</span>
                 </div>
-                <div class="h-1 bg-neutral-800 rounded-full overflow-hidden">
-                    <div id="bar-burden" class="value-bar bg-red-600" style="width: 80%"></div>
+                <div class="progress-container">
+                    <div id="bar-dignity" class="bar bg-white" style="width: 80%"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-[9px] font-bold text-red-500">負荷</span>
+                    <span id="val-burden" class="text-[10px] text-white">80</span>
+                </div>
+                <div class="progress-container">
+                    <div id="bar-burden" class="bar bg-red-600" style="width: 80%"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <main class="max-w-xl mx-auto px-6 relative z-10">
+    <main class="relative z-10">
         <!-- 階段 1: 前導 -->
-        <section id="prologue" class="stage active fade-in text-center">
-            <div class="glass-panel space-y-8">
-                <h1 class="serif text-3xl font-bold text-white tracking-widest leading-relaxed">面對年輕型失智症<br><span class="text-xl opacity-50 ">該如何抉擇</span></h1>
-                <div class="space-y-5 text-neutral-300 font-light leading-relaxed text-sm">
-                    <p>一場意外車禍，醫生的拼命治療，讓他留在這個世界。</p>
-                    <p>但是，他卻和以前變得不一樣了。</p>
-                    <p class="serif text-white text-lg py-2 border-y border-white/10">「醫生說，這是失智症。」</p>
-                    <p>那年，他才三十九歲。</p>
+        <section id="prologue" class="stage active">
+            <div class="glass-panel text-center fade-up space-y-6">
+                <h1 class="serif text-2xl font-bold text-white tracking-widest">面對年輕失智症患者<br><span class="text-sm opacity-50 font-light">該如何抉擇</span></h1>
+                <div class="space-y-4 text-neutral-300 font-light leading-relaxed text-sm">
+                    <p>他以前是家裡最可靠的人。</p>
+                    <p>出門前會記得關上所有燈，會提醒你帶鑰匙。</p>
+                    <p class="serif text-white text-base italic border-y border-white/10 py-4">「醫生說，這是失智症。」</p>
+                    <p>那年，他還不到四十歲。</p>
+                    <p>從那天開始，你發現很多事情都沒有「對的做法」。</p>
+                    <p>只有選擇，然後承擔。</p>
                 </div>
-                <button onclick="showStage('intro')" class="w-full py-4 border border-white/20 text-white/70 hover:text-white hover:bg-white/10 transition-all tracking-[0.3em] text-xs rounded-lg mt-4">
-                    了解更多
-                </button>
+                <button onclick="showStage('intro')" class="w-full py-4 bg-white/10 border border-white/20 text-white rounded-xl text-xs tracking-widest uppercase">開始了解</button>
             </div>
         </section>
 
         <!-- 階段 2: 猜測題 -->
-        <section id="intro" class="stage fade-in text-center">
-            <div class="glass-panel space-y-10">
-                <h2 class="serif text-2xl text-white leading-relaxed">你認為全世界目前<br>最年輕的失智症患者是幾歲？</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">21 歲</button>
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">35 歲</button>
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">19 歲</button>
-                    <button onclick="showStage('answer')" class="py-8 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all text-xl font-light">45 歲</button>
+        <section id="intro" class="stage">
+            <div class="glass-panel text-center fade-up space-y-8">
+                <h2 class="serif text-xl text-white">你認為目前紀錄中<br>最年輕的失智症患者是幾歲？</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="showStage('answer')" class="py-6 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all">21 歲</button>
+                    <button onclick="showStage('answer')" class="py-6 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all">35 歲</button>
+                    <button onclick="showStage('answer')" class="py-6 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all">19 歲</button>
+                    <button onclick="showStage('answer')" class="py-6 bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all">45 歲</button>
                 </div>
             </div>
         </section>
 
         <!-- 階段 3: 揭曉答案 -->
-        <section id="answer" class="stage fade-in text-center">
-            <div class="glass-panel space-y-10">
-                <div class="space-y-2">
-                    <p class="text-[10px] tracking-[0.5em] text-neutral-400 uppercase">Case Report</p>
-                    <h2 class="serif text-9xl text-white font-bold">19</h2>
+        <section id="answer" class="stage">
+            <div class="glass-panel text-center fade-up space-y-8">
+                <div class="space-y-1">
+                    <p class="text-[9px] tracking-widest text-neutral-500 uppercase">Scientific Record</p>
+                    <h2 class="serif text-8xl text-white font-bold">19</h2>
                 </div>
-                <p class="text-neutral-300 font-light leading-relaxed text-base">這不是個案。<br>在正值壯年的年紀，有人年薪千萬；<br>有人卻罹患失智症，世界從此停滯。</p>
-                <button onclick="startGame()" class="w-full py-5 bg-white text-black font-bold tracking-widest hover:bg-neutral-200 transition-all uppercase text-xs rounded-lg">
-                    進入家屬的生活抉擇
-                </button>
+                <p class="text-neutral-300 font-light leading-relaxed text-sm">這不是特例。<br>失智症不只發生在老年。<br>當記憶慢慢消逝，家屬的考驗才剛開始。</p>
+                <button onclick="startGame()" class="w-full py-4 bg-white text-black font-bold rounded-xl text-xs tracking-widest uppercase">進入家屬視角</button>
             </div>
         </section>
 
         <!-- 遊戲主體 -->
         <section id="game" class="stage">
-            <div class="glass-panel space-y-8 relative">
-                <div class="space-y-3 border-b border-white/10 pb-6">
-                    <p id="scen-counter" class="text-[10px] text-white/40 tracking-[0.2em] uppercase"></p>
-                    <h3 id="scen-title" class="serif text-2xl text-white font-bold"></h3>
+            <div class="glass-panel fade-up space-y-6">
+                <div class="border-b border-white/10 pb-4">
+                    <p id="scen-counter" class="text-[9px] text-white/40 tracking-widest uppercase mb-1"></p>
+                    <h3 id="scen-title" class="serif text-xl text-white font-bold"></h3>
                 </div>
-                <p id="scen-desc" class="text-base text-neutral-200 font-light leading-relaxed"></p>
-                <div id="game-content" class="opacity-0 transition-opacity duration-1000 space-y-4">
-                    <div id="scen-options" class="space-y-4"></div>
-                </div>
+                <p id="scen-desc" class="text-sm text-neutral-300 font-light leading-relaxed"></p>
+                <div id="scen-options" class="pt-2"></div>
             </div>
         </section>
 
-        <!-- 階段 4: 結局 -->
-        <section id="ending" class="stage text-center">
-            <div class="glass-panel space-y-10">
-                <h2 id="ending-title" class="serif text-3xl text-white"></h2>
-                <div id="ending-desc" class="space-y-6 text-neutral-300 font-light leading-relaxed text-base"></div>
-                <div class="flex flex-col gap-4 pt-4">
-                    <button onclick="location.reload()" class="w-full py-5 bg-white text-black font-bold tracking-[0.4em] hover:bg-neutral-200 transition-all text-xs rounded-lg uppercase">
-                        重新開始體驗
-                    </button>
-                </div>
+        <!-- 結局 -->
+        <section id="ending" class="stage">
+            <div class="glass-panel text-center fade-up space-y-8">
+                <h2 id="ending-title" class="serif text-2xl text-white"></h2>
+                <div id="ending-desc" class="text-sm text-neutral-300 font-light leading-relaxed text-left space-y-4"></div>
+                <button onclick="location.reload()" class="w-full py-4 bg-white text-black font-bold rounded-xl text-xs tracking-widest uppercase">再次體驗</button>
             </div>
         </section>
     </main>
 
-    <!-- 回饋遮罩 -->
+    <!-- 反饋 -->
     <div id="feedback-overlay">
-        <div class="max-w-md space-y-12">
-            <p id="feedback-text" class="text-xl text-white font-light serif leading-relaxed italic"></p>
-            <button id="next-btn" onclick="nextScenario()" class="text-[10px] tracking-[0.5em] text-white/40 hover:text-white transition-colors uppercase py-4">
-                下一個抉擇 ➜
-            </button>
+        <div class="max-w-xs w-full space-y-10">
+            <p id="feedback-text" class="text-lg text-white font-light serif leading-relaxed italic"></p>
+            <button onclick="nextScenario()" class="text-[10px] tracking-widest text-white/50 hover:text-white uppercase py-4">繼續前行 ➜</button>
         </div>
     </div>
 
     <script>
+        // --- 核心邏輯與數據 ---
         const state = {
-            patient: 80,
-            dignity: 80,
-            burden: 80,
+            patient: 70,  // 患者健康/情緒
+            dignity: 70,  // 患者尊嚴
+            burden: 50,   // 家屬負荷 (0為輕鬆, 100為崩潰)
             currentIdx: 0,
-            isLocked: false,
             activeImgId: 'bg-img-a'
         };
 
         const scenarios = [
             {
-                title: '晚餐過後',
-                desc: '吃完晚餐才十分鐘，他第十五次詢問「我們什麼時候吃飯？」。你剛結束整天的加班，耐心已消磨殆盡。',
+                title: '混亂的餐桌',
+                desc: '他剛吃完飯不到五分鐘，又走進廚房問你：「今天不吃嗎？」這已經是今晚第十次。你剛加完班，全身疲憊不堪。',
                 options: [
-                    { text: '深呼吸，溫柔地帶他去看剛吃完的空碗。', impact: { patient: 5, dignity: 5, burden: -10 }, feedback: '他露出困惑但安心的神情。你卻在轉身時感到一陣巨大的疲憊。' },
-                    { text: '不再爭論，再給他準備一份少量的點心。', impact: { patient: 10, dignity: 0, burden: -5 }, feedback: '他高興地吃了。但你擔心長久下去他的血糖與體重會失控。' },
-                    { text: '終於崩潰大喊：「你剛剛才吃過！為什麼一直問！」', impact: { patient: -15, dignity: -20, burden: 5 }, feedback: '他被嚇壞了，縮在沙發角落。' }
+                    { text: '帶他去看剛洗好的碗，慢慢告訴他已經吃過了。', impact: { patient: 8, dignity: 5, burden: 12 }, feedback: '他盯著水槽看了一下，點點頭。但過沒多久，他又問了一樣的問題。' },
+                    { text: '再幫他盛一點飯，讓他安心吃完。', impact: { patient: 12, dignity: 0, burden: 8 }, feedback: '他很自然地坐下來吃。你開始想，這樣會不會變成每天都要多吃一餐。' },
+                    { text: '忍不住提高音量：「你剛剛才吃過！」', impact: { patient: -15, dignity: -10, burden: -5 }, feedback: '他愣住了，沒有再問。整個空間突然變得很安靜。' }
                 ]
             },
             {
-                title: '我還要去上班',
-                desc: '他堅持自己還能上班，但同事發現他連自己上班的位子在哪都找不到。老闆私下找你，婉轉表達希望他「提前退休」。',
+                title: '提早到來的退休',
+                desc: '公司打電話來，希望他「先休息一段時間」。他以前幾乎每天加班，現在連怎麼去公司都有點記不起來。',
                 options: [
-                    { text: '實話實說，告訴他社會現在還沒準備好接納他。', impact: { patient: -10, dignity: -25, burden: 10 }, feedback: '他沉默地撕掉識別證，眼神裡最後的光熄滅了。' },
-                    { text: '騙他公司在改組，先休息一陣子。', impact: { patient: 5, dignity: 15, burden: -10 }, feedback: '保住了他的自尊，但他每天準時著裝待發，讓謊言變得更難圓。' },
-                    { text: '自己開個「家庭工作室」，讓他處理簡單家務並付他「薪水」。', impact: { patient: 15, dignity: 20, burden: -20 }, feedback: '他覺得自己很有用。但你的經濟與心理壓力變得更加沈重。' }
+                    { text: '直接跟他說公司希望他先離開。', impact: { patient: -10, dignity: -25, burden: 10 }, feedback: '他看著工作證很久，最後只問了一句：「那我以後要做什麼？」' },
+                    { text: '告訴他公司最近狀況不好，很多人都離職。', impact: { patient: 5, dignity: 10, burden: 15 }, feedback: '他點點頭，沒有再追問。但你必須扛起所有經濟空缺。' },
+                    { text: '幫他找一個比較簡單的工作，讓他還能每天出門。', impact: { patient: 10, dignity: 15, burden: 25 }, feedback: '他照樣每天準時出門。你開始習慣接陌生電話，確認他今天在哪裡。' }
                 ]
             },
             {
-                title: '老友聚會',
-                desc: '昔日老友邀請你參加聚會，你很想去呼吸新鮮空氣，但他現在只要你不在視線內就會極度焦慮。',
+                title: '童年的回憶',
+                desc: '你帶他回到以前常去的公園。他看著你，問：「這是哪裡？你是誰？」語氣很平常，像在問路。',
                 options: [
-                    { text: '帶著他一起參加，希望能讓他接觸人群。', impact: { patient: -10, dignity: -15, burden: -25 }, feedback: '他在餐廳因吵雜而尖叫。老友們的懼怕和閃避眼神讓你覺得丟臉。' },
-                    { text: '婉拒邀請，留在家陪他看舊影片。', impact: { patient: 10, dignity: 5, burden: -15 }, feedback: '他在你的陪伴下很平穩，但你看著群組的照片，慢慢遺失自我。' },
-                    { text: '請臨時看護代班兩小時，自己偷偷跑去喝杯咖啡。', impact: { patient: -10, dignity: 0, burden: 10 }, feedback: '那一小段自由讓你重新活過來，但一踏進家門面對他的質疑：「為何有外人在家？」' }
+                    { text: '拿出以前的照片，一張一張講給他聽', impact: { patient: -10, dignity: -10, burden: 15 }, feedback: '他看著照片，眉頭越皺越緊，好像越看越不確定。' },
+                    { text: '順著他的狀態，當作第一次認識他。', impact: { patient: 15, dignity: 0, burden: 10 }, feedback: '他對你很有禮貌地笑，像在認識一個新朋友。' },
+                    { text: '不強求記憶，只是靜靜地陪他坐在長椅上。', impact: { patient: 20, dignity: 10, burden: 5 }, feedback: '他安靜下來了。你們坐了很久，但幾乎沒有對話。' }
                 ]
             },
             {
-                title: '請問你是？',
-                desc: '你帶他回到當初約會的公園。他指著你問：「這位小姐/先生，你是誰？我媽媽怎麼沒來接我？」',
+                title: '失序的開銷',
+                desc: '你發現他偷偷在網路上訂了十幾台同樣的收音機，因為他每次看到廣告都忘記自己買過了。',
                 options: [
-                    { text: '泣不成聲，拿出相簿一遍一遍唸著自己的名字。', impact: { patient: -10, dignity: -10, burden: -15 }, feedback: '他感到無比焦慮，開始用力抓頭髮。這場重遊變成了災難。' },
-                    { text: '強忍悲傷，假裝自己是他的朋友繼續聊天。', impact: { patient: 15, dignity: 0, burden: -10 }, feedback: '他平靜下來了，像個孩子一樣對你微笑，但你心裡最後的一塊牆塌了。' },
-                    { text: '靜靜地陪他在長椅上看夕陽，不再勉強他想起什麼。', impact: { patient: 20, dignity: 10, burden: 10 }, feedback: '那一刻的寧靜是這幾個月最奢侈的禮物。雖然他記不起你，但當下是和諧的。' }
+                    { text: '把東西退掉，並收走他的卡片和手機。', impact: { patient: -15, dignity: -30, burden: 15 }, feedback: '他開始變得很少出門，常坐在原地發呆。' },
+                    { text: '請家人或機構幫忙管理他的錢。', impact: { patient: -5, dignity: -15, burden: 20 }, feedback: '事情變得複雜，需要一直解釋狀況，也開始有外人介入你們的生活。' },
+                    { text: '不處理，東西留下來或送人。', impact: { patient: 5, dignity: 5, burden: 30 }, feedback: '他沒有察覺問題。只是你開始計算這樣還能撐多久。' }
                 ]
             },
             {
-                title: '錢去哪了？',
-                desc: '你發現他偷偷用了信用卡，在網路上訂購了二十台同樣的除濕機，因為他忘記自己已經訂過了。',
+                title: '你去哪了？',
+                desc: '你只是去陽台曬個衣服，他就不見了。三小時後警察打來，說在高架橋下找到他。他連鞋子都沒有穿。',
                 options: [
-                    { text: '忍痛支付退貨運費，並耐心地收好信用卡。', impact: { patient: 0, dignity: 5, burden: -20 }, feedback: '財務損失了，但你沒有責怪他。看著客廳滿地的箱子，你感到無力。' },
-                    { text: '嚴厲地沒收他的手機與電腦，斷絕網路。', impact: { patient: -25, dignity: -35, burden: 15 }, feedback: '他失去了與世界的最後連結，像個被關起來的囚犯，對你產生敵意。' },
-                    { text: '將金融帳號交給親友代管，尋求外部介入。', impact: { patient: -5, dignity: -10, burden: 20 }, feedback: '財務安全了，但在親友面前解釋這些不堪，讓你精疲力竭。' }
+                    { text: '緊緊抱住他，先帶他回家，不提剛剛發生的事。', impact: { patient: 20, dignity: 15, burden: 15 }, feedback: '他像孩子般大哭。你決定在家裡加裝更多的鎖。' },
+                    { text: '幫他戴上明顯的失智症專屬識別手環。', impact: { patient: 0, dignity: -40, burden: -10 }, feedback: '之後出門安心很多，但他看到手環時，會一直想把它拿掉。' },
+                    { text: '在家裝監視設備，隨時用手機確認他的位置。', impact: { patient: -10, dignity: -10, burden: 35 }, feedback: '你開始一直看手機。就算他在家，也很難真正放鬆。' }
                 ]
             },
             {
-                title: '你到底要去哪裡？',
-                desc: '一轉頭，他趁你曬衣服時推門出去。三小時後警察在河邊發現他，他赤腳走在泥濘中，神情驚恐。',
+                title: '連出門都很困難',
+                desc: '你和他一起出門，他一臉羞愧，告訴你他尿褲子、沒辦法控制、無助地看著剛睡不到三小時的你。',
                 options: [
-                    { text: '緊緊抱住他，什麼都不責備。', impact: { patient: 20, dignity: 15, burden: -15 }, feedback: '他像孩子般大哭。但你意識到，你必須把家變成一座更堅固的「監牢」。' },
-                    { text: '幫他掛上刻有電話與病況的防走失手鍊。', impact: { patient: 0, dignity: -30, burden: 15 }, feedback: '安全性提升了，但看著那條手鍊，你覺得那是他身為成年人尊嚴的墓碑。' },
-                    { text: '鎖上所有對外的窗戶，並安裝 24 小時監控。', impact: { patient: -20, dignity: -25, burden: 20 }, feedback: '再也不會走失，但他在監控畫面中孤獨轉圈的模樣，讓你心如刀割。' }
-                ]
-            },
-            {
-                title: '我想去廁所',
-                desc: '他現在連如廁都需要你全程協助。這天深夜，他因為排泄問題弄髒了床鋪，正一臉愧疚地看著疲憊的你。',
-                options: [
-                    { text: '溫柔地說「沒關係，洗洗就好」，默默清理殘局。', impact: { patient: 15, dignity: 20, burden: -25 }, feedback: '你保住了他的尊嚴。但看著深夜三點的洗衣機，你覺得自己也快溶化了。' },
-                    { text: '開始考慮讓他穿上成人紙尿褲。', impact: { patient: -10, dignity: -40, burden: 20 }, feedback: '體力輕鬆了點，但他看著尿布流下的眼淚，讓你也跟著心碎。' },
-                    { text: '終於打電話預約了昂貴的護理中心。', impact: { patient: -30, dignity: -10, burden: 40 }, feedback: '這是一個逃生口，但簽名字時，你的手在發抖。' }
-                ]
-            },
-            {
-                title: '我還記得你',
-                desc: '病情急轉直下，他在大部份時間都只是對著牆壁發呆。但在這刻深夜，他突然看著你的眼睛，輕輕喊出了你的名字。',
-                options: [
-                    { text: '泣不成聲，緊緊握住他的手，回報這一絲光芒。', impact: { patient: 30, dignity: 20, burden: -10 }, feedback: '這聲呼喚支撐了你接下來半年的勇氣。' },
-                    { text: '趕緊錄影傳給親友分享奇蹟。', impact: { patient: 10, dignity: 10, burden: -5 }, feedback: '大家都為你打氣，但在錄完後，他又回到了那片無盡的迷霧。' },
-                    { text: '決定就在此時告別，正式簽下長期住院書。', impact: { patient: -50, dignity: -10, burden: 50 }, feedback: '你想在最後一刻留下美好的記憶。轉身離開，讓他留在專業照顧中。' }
+                    { text: '溫柔地說「沒關係，我也會這樣」，動手清理。', impact: { patient: 10, dignity: 30, burden: 25 }, feedback: '他一直重複說對不起。你陪他慢慢清理，眼淚也不停的流' },
+                    { text: '讓他在公眾場合也穿上成人紙尿褲。', impact: { patient: -5, dignity: -40, burden: -10 }, feedback: '事情變得比較好處理，但他變得不太願意靠近別人。' },
+                    { text: '連夜預約了全日制的專業養護中心。', impact: { patient: -40, dignity: -15, burden: -40 }, feedback: '你打電話的時候很冷靜，但掛掉後坐了很久。' }
                 ]
             }
         ];
 
-        /**
-         * 切換背景圖片 (支援淡入淡出)
-         * @param {string} fileName 圖片檔名 (不含路徑與副檔名)
-         */
+        // --- 功能函數 ---
+
         function changeBackground(fileName) {
             const nextImgId = state.activeImgId === 'bg-img-a' ? 'bg-img-b' : 'bg-img-a';
             const currentImg = document.getElementById(state.activeImgId);
             const nextImg = document.getElementById(nextImgId);
-            
-            // 預載圖片
             const newSrc = `pic/${fileName}.png`;
             
-            // 如果圖片路徑沒變，就不重複觸發動畫
-            if (currentImg.src.includes(newSrc) && currentImg.classList.contains('active')) return;
-
-            nextImg.src = newSrc;
-            
-            nextImg.onload = function() {
+            const tempImg = new Image();
+            tempImg.src = newSrc;
+            tempImg.onload = () => {
+                nextImg.src = newSrc;
                 nextImg.classList.add('active');
                 currentImg.classList.remove('active');
                 state.activeImgId = nextImgId;
             };
         }
 
-        function hideAll() {
+        function showStage(id) {
             document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
-            document.getElementById('feedback-overlay').classList.remove('active');
-            document.getElementById('status-bar').classList.add('hidden');
-        }
-
-        /**
-         * 顯示特定階段
-         * 除了 game 階段，其餘一律使用 start.png 背景
-         */
-        function showStage(name) {
-            hideAll();
-            const target = document.getElementById(name);
-            if (target) {
-                target.classList.add('active');
-            }
+            document.getElementById(id).classList.add('active');
             
-            // 根據階段決定背景
-            if (name === 'game') {
-                document.getElementById('status-bar').classList.remove('hidden');
-                // 遊戲背景由 loadScenario 決定
+            if (id === 'game') {
+                document.getElementById('status-dashboard').classList.add('active');
             } else {
+                document.getElementById('status-dashboard').classList.remove('active');
                 changeBackground('start');
             }
             window.scrollTo(0, 0);
@@ -364,8 +346,8 @@
 
         function startGame() {
             state.currentIdx = 0;
-            state.patient = 80; state.dignity = 80; state.burden = 80;
-            refreshBars();
+            state.patient = 70; state.dignity = 70; state.burden = 50;
+            updateStats();
             showStage('game');
             loadScenario();
         }
@@ -373,17 +355,11 @@
         function loadScenario() {
             const sc = scenarios[state.currentIdx];
             if (!sc) {
-                showFinalEnding();
+                calculateEnding();
                 return;
             }
 
-            state.isLocked = false;
-            const content = document.getElementById('game-content');
-            content.style.opacity = '0';
-            
-            // 切換至對應題目的背景 (scene1, scene2...)
             changeBackground(`scene${state.currentIdx + 1}`);
-
             document.getElementById('scen-counter').innerText = `抉擇 ${state.currentIdx + 1} / ${scenarios.length}`;
             document.getElementById('scen-title').innerText = sc.title;
             document.getElementById('scen-desc').innerText = sc.desc;
@@ -394,43 +370,40 @@
                 const b = document.createElement('button');
                 b.className = 'btn-option';
                 b.innerText = o.text;
-                b.onclick = () => handleChoice(i);
+                b.onclick = () => selectOption(i);
                 optBox.appendChild(b);
             });
-
-            setTimeout(() => { content.style.opacity = '1'; }, 300);
         }
 
-        function handleChoice(idx) {
-            if (state.isLocked) return;
+        function selectOption(idx) {
             const opt = scenarios[state.currentIdx].options[idx];
-            state.isLocked = true;
-
             state.patient = Math.min(100, Math.max(0, state.patient + opt.impact.patient));
             state.dignity = Math.min(100, Math.max(0, state.dignity + opt.impact.dignity));
             state.burden = Math.min(100, Math.max(0, state.burden + opt.impact.burden));
             
-            refreshBars();
+            updateStats();
+            
             document.getElementById('feedback-text').innerText = opt.feedback;
             document.getElementById('feedback-overlay').classList.add('active');
         }
 
-        function refreshBars() {
-            ['patient', 'dignity', 'burden'].forEach(k => {
-                const bar = document.getElementById('bar-' + k);
-                const val = document.getElementById('val-' + k);
-                if (bar) bar.style.width = state[k] + '%';
-                if (val) val.innerText = state[k];
-            });
+        function updateStats() {
+            document.getElementById('val-patient').innerText = state.patient;
+            document.getElementById('bar-patient').style.width = state.patient + '%';
             
-            if (state.patient <= 0 || state.dignity <= 0 || state.burden <= 0) {
-                setTimeout(() => {
-                    hideAll();
-                    changeBackground('start');
-                    document.getElementById('ending').classList.add('active');
-                    document.getElementById('ending-title').innerText = "你的精力已燃盡";
-                    document.getElementById('ending-desc').innerHTML = "<p>在無盡的選擇中，你們都已筋疲力盡。<br>這不僅是體力的透支，精神上更加無力。<br>失智症不僅帶走了他的記憶，也消磨了你的人生。</p>";
-                }, 800);
+            document.getElementById('val-dignity').innerText = state.dignity;
+            document.getElementById('bar-dignity').style.width = state.dignity + '%';
+            
+            document.getElementById('val-burden').innerText = state.burden;
+            document.getElementById('bar-burden').style.width = state.burden + '%';
+
+            // 崩潰檢查
+            if (state.burden >= 100) {
+                triggerFail('burden');
+            } else if (state.patient <= 0) {
+                triggerFail('patient');
+            } else if (state.dignity <= 0) {
+                triggerFail('dignity');
             }
         }
 
@@ -440,18 +413,47 @@
             loadScenario();
         }
 
-        function showFinalEnding() {
+        function triggerFail(type) {
+            document.getElementById('feedback-overlay').classList.remove('active');
             showStage('ending');
-            changeBackground('start');
-            document.getElementById('ending-title').innerText = "漫長告別的開始";
-            document.getElementById('ending-desc').innerHTML = `
-                <p>這八個抉擇，只是年輕失智症患者家屬生活的冰山一角。</p>
-                <p>從最初的健忘，到後來的性格劇變，最後甚至連家人都忘記了。</p>
-                <p>年輕型失智症最殘酷的地方，在於它發生在原本應當成家立業、支撐家庭的年紀。<br><br><strong>「他好像在，又好像不在。」</strong><br><br>希望這段短暫的體驗，能讓你多一份理解與善意。</p>
-            `;
+            document.getElementById('ending-title').innerText = "倒下的照顧者";
+            const desc = document.getElementById('ending-desc');
+            if (type === 'burden') {
+                desc.innerHTML = "<p>你開始記不清上一次好好睡覺是什麼時候。有些決定不是你不想撐，而是真的撐不住了。</p>";
+            } else if (type === 'patient') {
+                desc.innerHTML = "<p>他他變得很少有反應。你還是每天照顧他，但越來越難分辨他有沒有在聽。</p>";
+            } else {
+                desc.innerHTML = "<p>生活變得只剩下處理問題，他也不太能接受這些做法，這場照顧變得像是一種羞辱。</p>";
+            }
         }
 
-        // 初始化
+        function calculateEnding() {
+            showStage('ending');
+            const title = document.getElementById('ending-title');
+            const desc = document.getElementById('ending-desc');
+
+            // 根據三個指數的相對值決定結局
+            if (state.burden > state.patient && state.burden > state.dignity) {
+                title.innerText = "結局：守望者";
+                desc.innerHTML = `
+                    <p>你把大部分的時間都留給了他。生活變得很單一，但你沒有離開，卻也失去自己的生活。</p>
+                    <p><strong>家屬負荷：${state.burden}%</strong> - 你的身體已發出警訊，請記得：唯有照顧好自己，才能照顧好他。</p>
+                `;
+            } else if (state.dignity > state.patient) {
+                title.innerText = "結局：送行者";
+                desc.innerHTML = `
+                    <p>直到最後，你都努力讓他維持著成年人的尊嚴。雖然辛苦，但讓他在最混亂的時刻，依然被當作一個人對待。</p>
+                    <p><strong>尊嚴指數：${state.dignity}%</strong> - 這是一份充滿敬意的愛。</p>
+                `;
+            } else {
+                title.innerText = "結局：共存";
+                desc.innerHTML = `
+                    <p>你慢慢習慣現在的生活節奏。有些事情不再追問，有些時候就順著過。</p>
+                    <p><strong>患者狀態：${state.patient}%</strong> - 即使在迷霧中，你們依然牽著手。</p>
+                `;
+            }
+        }
+
         window.onload = () => {
             const initialImg = document.getElementById('bg-img-a');
             initialImg.src = 'pic/start.png';
