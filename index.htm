@@ -11,7 +11,9 @@
     <style>
         :root {
             --primary-bg: #0a0a0a;
-            --glass: rgba(18, 18, 18, 0.75);
+            --glass: rgba(18, 18, 18, 0.85);
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
         }
         body {
             background: var(--primary-bg);
@@ -36,78 +38,83 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: brightness(0.3);
+            filter: brightness(0.35);
             transition: opacity 2s ease-in-out;
             opacity: 0;
         }
         .bg-image.active { opacity: 1; }
 
-        /* 頂部狀態列優化 */
+        /* 頂部狀態列優化 - 懸浮顯眼樣式 */
         #status-dashboard {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 480px;
             z-index: 100;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
-            padding: 1rem 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1rem;
+            padding: 0.75rem;
             display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
         #status-dashboard.active { display: block; }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 0.5rem;
+            padding: 0.4rem 0.6rem;
             text-align: center;
-            transition: all 0.5s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* 警告狀態：爆表或瀕臨危險 */
         .stat-warning {
-            border-color: rgba(239, 68, 68, 0.8);
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-            background: rgba(127, 29, 29, 0.2);
+            border-color: rgba(239, 68, 68, 0.6);
+            background: rgba(239, 68, 68, 0.15);
+            transform: scale(1.02);
         }
 
         .progress-container {
-            height: 4px;
+            height: 6px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-top: 4px;
+            border-radius: 3px;
+            margin-top: 6px;
             overflow: hidden;
         }
 
-        .bar { transition: width 1s ease; height: 100%; }
+        .bar { transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
 
         /* 閃爍動畫 */
         .animate-pulse-fast {
-            animation: pulse-fast 0.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: pulse-fast 0.8s infinite;
         }
 
         @keyframes pulse-fast {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            0%, 100% { opacity: 1; filter: brightness(1.2); }
+            50% { opacity: 0.5; filter: brightness(0.8); }
         }
 
         /* 遊戲排版優化 */
         .stage { 
             display: none; 
             min-height: 100vh;
-            padding: 100px 1.25rem 40px; 
+            padding: 120px 1.25rem 40px; 
         }
         .stage.active { display: flex; flex-direction: column; justify-content: center; }
 
         .glass-panel {
             background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1.5rem;
-            padding: 2rem 1.5rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            padding: 2.25rem 1.75rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
@@ -115,29 +122,31 @@
 
         .btn-option {
             width: 100%;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.1rem;
+            padding: 1.25rem;
             border-radius: 1rem;
             font-size: 0.95rem;
             line-height: 1.5;
             transition: all 0.3s ease;
             color: #e0e0e0;
             text-align: left;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
+            position: relative;
+            overflow: hidden;
         }
-        .btn-option:active { transform: scale(0.98); background: rgba(255, 255, 255, 0.15); }
+        .btn-option:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.15); }
         @media (min-width: 768px) {
-            .btn-option:hover { background: #fff; color: #000; transform: translateX(5px); }
+            .btn-option:hover { background: #fff; color: #000; transform: translateX(8px); }
         }
 
         #feedback-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.96);
             z-index: 200;
             display: none;
-            padding: 2rem;
+            padding: 2.5rem;
             align-items: center;
             justify-content: center;
             text-align: center;
@@ -145,9 +154,9 @@
         #feedback-overlay.active { display: flex; }
 
         /* 動畫 */
-        .fade-up { animation: fadeUp 0.8s ease-out forwards; }
+        .fade-up { animation: fadeUp 1s ease-out forwards; }
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -159,34 +168,34 @@
         <img id="bg-img-b" class="bg-image" alt="">
     </div>
 
-    <!-- 狀態面板 -->
+    <!-- 狀態面板 - 優化後的設計 -->
     <div id="status-dashboard">
-        <div class="max-w-lg mx-auto grid grid-cols-3 gap-2 px-2">
-            <div id="card-patient" class="stat-card">
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-[9px] font-bold text-blue-400">患者</span>
-                    <span id="val-patient" class="text-[10px] text-white">80</span>
+        <div class="grid grid-cols-3 gap-3">
+            <div id="card-patient" class="stat-card border border-transparent">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-[10px] font-bold text-blue-400 tracking-wider">患者狀態</span>
+                    <span id="val-patient" class="text-[11px] font-mono font-bold text-white">80</span>
                 </div>
                 <div class="progress-container">
-                    <div id="bar-patient" class="bar bg-blue-500" style="width: 80%"></div>
+                    <div id="bar-patient" class="bar bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" style="width: 80%"></div>
                 </div>
             </div>
-            <div id="card-dignity" class="stat-card">
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-[9px] font-bold text-stone-300">尊嚴</span>
-                    <span id="val-dignity" class="text-[10px] text-white">80</span>
+            <div id="card-dignity" class="stat-card border border-transparent">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-[10px] font-bold text-stone-300 tracking-wider">生命尊嚴</span>
+                    <span id="val-dignity" class="text-[11px] font-mono font-bold text-white">80</span>
                 </div>
                 <div class="progress-container">
-                    <div id="bar-dignity" class="bar bg-white" style="width: 80%"></div>
+                    <div id="bar-dignity" class="bar bg-stone-100 shadow-[0_0_8px_rgba(255,255,255,0.4)]" style="width: 80%"></div>
                 </div>
             </div>
-            <div id="card-burden" class="stat-card">
-                <div class="flex justify-between items-center px-1">
-                    <span class="text-[9px] font-bold text-red-500">負荷</span>
-                    <span id="val-burden" class="text-[10px] text-white">80</span>
+            <div id="card-burden" class="stat-card border border-transparent">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-[10px] font-bold text-red-500 tracking-wider">照顧負荷</span>
+                    <span id="val-burden" class="text-[11px] font-mono font-bold text-white">80</span>
                 </div>
                 <div class="progress-container">
-                    <div id="bar-burden" class="bar bg-red-600" style="width: 80%"></div>
+                    <div id="bar-burden" class="bar bg-red-600 shadow-[0_0_8px_rgba(239,68,68,0.5)]" style="width: 80%"></div>
                 </div>
             </div>
         </div>
@@ -403,22 +412,19 @@
         }
 
         function updateStats() {
-            // 更新數值文字
             document.getElementById('val-patient').innerText = state.patient;
             document.getElementById('val-dignity').innerText = state.dignity;
             document.getElementById('val-burden').innerText = state.burden;
 
-            // 更新進度條寬度
             document.getElementById('bar-patient').style.width = state.patient + '%';
             document.getElementById('bar-dignity').style.width = state.dignity + '%';
             document.getElementById('bar-burden').style.width = state.burden + '%';
 
-            // 提示邏輯：接近危險值
+            // 更新警告樣式
             handleStatIndicator('patient', state.patient < 25);
             handleStatIndicator('dignity', state.dignity < 25);
             handleStatIndicator('burden', state.burden > 80);
 
-            // 失敗判斷
             if (state.burden >= 100) {
                 triggerFail('burden');
             } else if (state.patient <= 0) {
@@ -428,7 +434,6 @@
             }
         }
 
-        // 處理能量條警告效果
         function handleStatIndicator(type, isWarning) {
             const card = document.getElementById(`card-${type}`);
             const bar = document.getElementById(`bar-${type}`);
