@@ -305,9 +305,9 @@
                 title: '失控的超市',
                 desc: '你接到超市電話：「是不會管好家人嗎？偷拆冰淇淋和餅乾吃也太誇張了吧！」你趕到時，他正被眾人圍觀，臉上掛著無辜又困惑的表情。',
                 options: [
-                    { text: '對工作人員鞠躬道歉，並沒收他的卡片手機。', impact: { patient: -15, dignity: -40, burden: 20 }, feedback: '衝突解決了，但他變得很怕出門，社會連結徹底斷裂。' },
+                    { text: '對工作人員鞠躬道歉，並沒收他的卡片手機。', impact: { patient: -15, dignity: -40, burden: 20 }, feedback: '衝突解決了，但他變得很怕出門，和社會慢慢脫軌。' },
                     { text: '冷靜賠償，並製作「我生病了」小牌子讓他掛著。', impact: { patient: 5, dignity: -30, burden: 10 }, feedback: '超市理解了，但那塊牌子成了沈重的標籤。' },
-                    { text: '自己扛下責難，每天陪他逛街以防意外。', impact: { patient: 10, dignity: 15, burden: 40 }, feedback: '他的尊嚴完好無損，但你的私人時間已蕩然無存。' }
+                    { text: '自己扛下責難，每天陪他逛街以防意外。', impact: { patient: 10, dignity: 15, burden: 40 }, feedback: '他的尊嚴完好無損，但你再也沒有私人時間。' }
                 ]
             },
             {
@@ -324,8 +324,8 @@
                 desc: '你和他一起出門，他一臉羞愧，告訴你他尿褲子、沒辦法控制、無助地看著剛睡不到三小時的你。',
                 options: [
                     { text: '溫柔地說「沒關係，我也會這樣」，動手清理。', impact: { patient: 10, dignity: 30, burden: 25 }, feedback: '他一直重複說對不起。你陪他慢慢清理，眼淚也不停的流' },
-                    { text: '讓他在公眾場合也穿上成人紙尿褲。', impact: { patient: -5, dignity: -40, burden: -10 }, feedback: '事情變得比較好處理，但他變得不太願意靠近別人。' },
-                    { text: '連夜預約了全日制的專業養護中心。', impact: { patient: -40, dignity: -15, burden: -40 }, feedback: '你打電話的時候很冷靜，但掛掉後坐了很久。' }
+                    { text: '讓他穿上成人紙尿褲。', impact: { patient: -5, dignity: -40, burden: -10 }, feedback: '不用處理尿失禁，但他變得不太願意靠近別人。' },
+                    { text: '連夜預約了全日制的專業養護中心。', impact: { patient: -40, dignity: -15, burden: -40 }, feedback: '聊完養護中心細項，你掛掉後自己一個人坐了很久，擔心他在那邊會不會收到好的照顧。' }
                 ]
             }
         ];
@@ -480,7 +480,7 @@
                     <p><strong>尊嚴指數：${state.dignity}%</strong> - 這是一份充滿敬意的愛。</p>
                 `;
             } else {
-                title.innerText = "結局：共存";
+                title.innerText = "結局：勉強共存";
                 desc.innerHTML = `
                     <p>你慢慢習慣現在的生活節奏。有些事情不再追問，有些時候就順著過。</p>
                     <p><strong>患者狀態：${state.patient}%</strong> - 你們依然在一起。</p>
