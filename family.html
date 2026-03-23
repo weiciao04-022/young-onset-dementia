@@ -2,28 +2,37 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>家屬體驗｜年輕型失智症</title>
-
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- 字體 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            margin: 0;
-            font-family: 'Noto Sans TC', sans-serif;
-            background: #0a0a0a;
-            color: #fff;
+        :root {
+            --primary-bg: #0a0a0a;
+            --glass: rgba(18, 18, 18, 0.85);
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
         }
 
-        /* ===== 你原本背景 ===== */
+        body {
+            background: var(--primary-bg);
+            color: #f5f5f5;
+            font-family: 'Noto Sans TC', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .serif { font-family: 'Noto Serif TC', serif; }
+
         #bg-container {
             position: fixed;
             inset: 0;
             z-index: -1;
+            background: #000;
         }
 
         .bg-image {
@@ -32,18 +41,144 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: brightness(0.4);
+            filter: brightness(0.35);
+            transition: opacity 2s ease-in-out;
             opacity: 0;
-            transition: opacity 1.5s;
         }
 
-        .bg-image.active {
+        .bg-image.active { opacity: 1; }
+
+        #danger-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background-color: rgba(239, 68, 68, 0);
+        }
+
+        #danger-overlay.active {
+            animation: full-screen-danger 1.5s infinite ease-in-out;
             opacity: 1;
         }
 
-        /* ===== 結尾導流按鈕 ===== */
+        @keyframes full-screen-danger {
+            0%, 100% {
+                background-color: rgba(239, 68, 68, 0);
+                box-shadow: inset 0 0 0px rgba(239, 68, 68, 0);
+            }
+            50% {
+                background-color: rgba(239, 68, 68, 0.15);
+                box-shadow: inset 0 0 150px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        #status-dashboard {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 480px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        #status-dashboard.active { display: block; }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 0.5rem;
+            padding: 0.4rem 0.6rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-container {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .stage {
+            display: none;
+            min-height: 100vh;
+            padding: 120px 1.25rem 40px;
+        }
+
+        .stage.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2.25rem 1.75rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 60;
+        }
+
+        .btn-option {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+            color: #e0e0e0;
+            text-align: left;
+            margin-bottom: 0.85rem;
+        }
+
+        #feedback-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.96);
+            z-index: 200;
+            display: none;
+            padding: 2.5rem;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #feedback-overlay.active { display: flex; }
+
+        .fade-up { animation: fadeUp 1s ease-out forwards; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .ending-links {
-            margin-top: 40px;
+            margin-top: 32px;
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
@@ -68,250 +203,13 @@
 </head>
 
 <body>
-
-<!-- ===== 背景容器 ===== -->
-<div id="bg-container"></div>
-
-<!-- ===== 主內容 ===== -->
-<div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
-
-    <h1 class="text-3xl font-bold mb-6">
-        家屬體驗
-    </h1>
-
-    <p class="text-gray-300 mb-10">
-        你正在照顧一位年輕型失智症患者。<br>
-        每一個選擇，都影響你與他的關係。
-    </p>
-
-    <!-- ===== 這裡放你的互動系統 ===== -->
-    <div id="game-container">
-        <!-- 你原本的 JS / 選項 / stage 全部照貼進來 -->
-        <p class="text-gray-400">（這裡貼你的互動程式碼）</p>
-    </div>
-
-    <!-- ===== 結尾導流（非常重要） ===== -->
-    <div class="ending-links">
-
-        <a href="index.html" class="ending-btn">
-            回首頁
-        </a>
-
-        <a href="patient.html" class="ending-btn ghost">
-            體驗其他身分
-        </a>
-
-        <a href="reality.html" class="ending-btn ghost">
-            了解現實
-        </a>
-
-        <a href="report.html" class="ending-btn ghost">
-            閱讀專題報導
-        </a>
-
-    </div>
-
-</div>
-
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>年輕型失智症：該如何抉擇</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-bg: #0a0a0a;
-            --glass: rgba(18, 18, 18, 0.85);
-            --accent-blue: #3b82f6;
-            --accent-red: #ef4444;
-        }
-        body {
-            background: var(--primary-bg);
-            color: #f5f5f5;
-            font-family: 'Noto Sans TC', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .serif { font-family: 'Noto Serif TC', serif; }
-        
-        #bg-container {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: #000;
-        }
-
-        .bg-image {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.35);
-            transition: opacity 2s ease-in-out;
-            opacity: 0;
-        }
-        .bg-image.active { opacity: 1; }
-
-        /* 全螢幕閃爍警示層 */
-        #danger-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50; 
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            background-color: rgba(239, 68, 68, 0);
-        }
-        
-        #danger-overlay.active {
-            animation: full-screen-danger 1.5s infinite ease-in-out;
-            opacity: 1;
-        }
-
-        @keyframes full-screen-danger {
-            0%, 100% { 
-                background-color: rgba(239, 68, 68, 0); 
-                box-shadow: inset 0 0 0px rgba(239, 68, 68, 0);
-            }
-            50% { 
-                background-color: rgba(239, 68, 68, 0.15); 
-                box-shadow: inset 0 0 150px rgba(239, 68, 68, 0.6); 
-            }
-        }
-
-        /* 頂部狀態列 */
-        #status-dashboard {
-            position: fixed;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            max-width: 480px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 1rem;
-            padding: 0.75rem;
-            display: none;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        }
-        #status-dashboard.active { display: block; }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 0.5rem;
-            padding: 0.4rem 0.6rem;
-            text-align: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .stat-warning {
-            border-color: rgba(239, 68, 68, 0.6);
-            background: rgba(239, 68, 68, 0.15);
-        }
-
-        .progress-container {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            margin-top: 6px;
-            overflow: hidden;
-        }
-
-        .bar { transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); height: 100%; }
-
-        .animate-pulse-fast {
-            animation: pulse-fast 0.8s infinite;
-        }
-
-        @keyframes pulse-fast {
-            0%, 100% { opacity: 1; filter: brightness(1.2); }
-            50% { opacity: 0.5; filter: brightness(0.8); }
-        }
-
-        /* 遊戲排版 */
-        .stage { 
-            display: none; 
-            min-height: 100vh;
-            padding: 120px 1.25rem 40px; 
-        }
-        .stage.active { display: flex; flex-direction: column; justify-content: center; }
-
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem;
-            padding: 2.25rem 1.75rem;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 60; 
-        }
-
-        .btn-option {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.25rem;
-            border-radius: 1rem;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            transition: all 0.3s ease;
-            color: #e0e0e0;
-            text-align: left;
-            margin-bottom: 0.85rem;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-option:active { transform: scale(0.97); background: rgba(255, 255, 255, 0.15); }
-        @media (min-width: 768px) {
-            .btn-option:hover { background: #fff; color: #000; transform: translateX(8px); }
-        }
-
-        #feedback-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.96);
-            z-index: 200;
-            display: none;
-            padding: 2.5rem;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        #feedback-overlay.active { display: flex; }
-
-        .fade-up { animation: fadeUp 1s ease-out forwards; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body>
-
     <div id="bg-container">
         <img id="bg-img-a" class="bg-image" alt="">
         <img id="bg-img-b" class="bg-image" alt="">
     </div>
 
-    <!-- 全螢幕閃爍警示層 -->
     <div id="danger-overlay"></div>
 
-    <!-- 狀態面板 -->
     <div id="status-dashboard">
         <div class="grid grid-cols-3 gap-3">
             <div id="card-patient" class="stat-card border border-transparent">
@@ -323,6 +221,7 @@
                     <div id="bar-patient" class="bar bg-blue-500" style="width: 70%"></div>
                 </div>
             </div>
+
             <div id="card-dignity" class="stat-card border border-transparent">
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-[10px] font-bold text-stone-300 tracking-wider">生命尊嚴</span>
@@ -332,6 +231,7 @@
                     <div id="bar-dignity" class="bar bg-stone-100" style="width: 70%"></div>
                 </div>
             </div>
+
             <div id="card-burden" class="stat-card border border-transparent">
                 <div class="flex justify-between items-center mb-1">
                     <span class="text-[10px] font-bold text-red-500 tracking-wider">照顧負荷</span>
@@ -347,7 +247,10 @@
     <main class="relative z-10">
         <section id="prologue" class="stage active">
             <div class="glass-panel text-center fade-up space-y-6">
-                <h1 class="serif text-2xl font-bold text-white tracking-widest">面對年輕失智症患者<br><span class="text-sm opacity-50 font-light">該如何抉擇</span></h1>
+                <h1 class="serif text-2xl font-bold text-white tracking-widest">
+                    面對年輕失智症患者<br>
+                    <span class="text-sm opacity-50 font-light">該如何抉擇</span>
+                </h1>
                 <div class="space-y-4 text-neutral-300 font-light leading-relaxed text-sm">
                     <p>他以前是家裡最可靠的人。</p>
                     <p>出門前會記得關上所有燈，會提醒你帶鑰匙。</p>
@@ -356,7 +259,9 @@
                     <p>從那天開始，你發現很多事情沒有對的做法。</p>
                     <p>只有選擇，然後承擔。</p>
                 </div>
-                <button onclick="showStage('intro')" class="w-full py-4 bg-white/10 border border-white/20 text-white rounded-xl text-xs tracking-widest uppercase">開始了解</button>
+                <button onclick="showStage('intro')" class="w-full py-4 bg-white/10 border border-white/20 text-white rounded-xl text-xs tracking-widest uppercase">
+                    開始了解
+                </button>
             </div>
         </section>
 
@@ -372,19 +277,37 @@
             </div>
         </section>
 
-        <section id="answer" class="stage
-<script>
-/*
-⚠️ 這裡直接貼你原本 txt 裡的所有 JS
-包含：
-- stage 切換
-- 選項 impact
-- danger overlay
-- 背景輪播
-*/
+        <!-- 這裡開始接你後面真正的 stage -->
+        <!-- 例如 answer、scene1、scene2、ending ... -->
 
-console.log("family page loaded");
-</script>
+        <section id="ending" class="stage">
+            <div class="glass-panel text-center fade-up space-y-6">
+                <h2 class="serif text-2xl">體驗結束</h2>
+                <p class="text-neutral-300 leading-relaxed">
+                    你所做的每一個選擇，都反映照顧者在現實中承受的拉扯與負荷。
+                </p>
 
+                <div class="ending-links">
+                    <a href="index.html" class="ending-btn">回首頁</a>
+                    <a href="patient.html" class="ending-btn ghost">體驗其他身分</a>
+                    <a href="reality.html" class="ending-btn ghost">了解現實</a>
+                    <a href="report.html" class="ending-btn ghost">閱讀專題報導</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="feedback-overlay"></div>
+
+    <script>
+        function showStage(id) {
+            document.querySelectorAll('.stage').forEach(stage => {
+                stage.classList.remove('active');
+            });
+            const target = document.getElementById(id);
+            if (target) target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>
