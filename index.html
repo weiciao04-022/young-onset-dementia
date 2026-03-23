@@ -7,44 +7,56 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="hero">
+  <header class="hero hero-home">
     <div class="container">
-      <p class="eyebrow">This is homepage</p>
+      <p class="eyebrow">Interactive homepage</p>
       <h1>年輕失智症互動體驗</h1>
       <p class="intro">
-        請選擇你想體驗的身分。每一條路徑都會帶你從不同位置理解年輕失智症：患者、家屬、志工與職業重建評估。
+        請選擇你想進入的身分。你將從患者、家屬、志工與職業重建評估四個位置，理解年輕失智症如何改變一個人的生活與周圍的人。
       </p>
     </div>
   </header>
 
   <main class="container section">
-    <div class="grid four-up">
-      <a class="card" href="patient.html">
-        <span class="tag">角色 01</span>
-        <h2>患者</h2>
-        <p>找東西的遊戲，模擬記憶與辨識混亂。</p>
-        <span class="cta">進入體驗 →</span>
+    <div class="role-grid">
+      <a class="role-card" href="patient.html" style="background-image: url('images/patient.jpg');">
+        <div class="role-overlay"></div>
+        <div class="role-content">
+          <span class="role-tag">角色 01</span>
+          <h2>患者</h2>
+          <p>找東西的遊戲，模擬記憶混亂與辨識落差。</p>
+          <span class="role-cta">進入體驗 →</span>
+        </div>
       </a>
 
-      <a class="card" href="family.html">
-        <span class="tag">角色 02</span>
-        <h2>家屬</h2>
-        <p>情境選擇題，體會照顧決策與情緒壓力。</p>
-        <span class="cta">進入體驗 →</span>
+      <a class="role-card" href="family.html" style="background-image: url('images/family.jpg');">
+        <div class="role-overlay"></div>
+        <div class="role-content">
+          <span class="role-tag">角色 02</span>
+          <h2>家屬</h2>
+          <p>情境選擇題，面對照顧壓力、情緒與抉擇。</p>
+          <span class="role-cta">進入體驗 →</span>
+        </div>
       </a>
 
-      <a class="card" href="volunteer.html">
-        <span class="tag">角色 03</span>
-        <h2>志工</h2>
-        <p>判斷是否需要轉介檢測，並做失智症等級分類。</p>
-        <span class="cta">進入體驗 →</span>
+      <a class="role-card" href="volunteer.html" style="background-image: url('images/volunteer.jpg');">
+        <div class="role-overlay"></div>
+        <div class="role-content">
+          <span class="role-tag">角色 03</span>
+          <h2>志工</h2>
+          <p>協助判斷是否需要檢測，理解辨識與轉介。</p>
+          <span class="role-cta">進入體驗 →</span>
+        </div>
       </a>
 
-      <a class="card" href="rehab.html">
-        <span class="tag">角色 04</span>
-        <h2>職業重建評估</h2>
-        <p>先保留為原型頁，之後可加入工作能力與支持需求評估。</p>
-        <span class="cta">進入體驗 →</span>
+      <a class="role-card" href="rehab.html" style="background-image: url('images/rehab.jpg');">
+        <div class="role-overlay"></div>
+        <div class="role-content">
+          <span class="role-tag">角色 04</span>
+          <h2>職業重建評估</h2>
+          <p>思考工作能力、支持需求與制度限制。</p>
+          <span class="role-cta">進入體驗 →</span>
+        </div>
       </a>
     </div>
   </main>
